@@ -1,6 +1,6 @@
 
 <big> This README file contais all the edited files of the project (the main.c file, the isr_rx.c file and the isr_pwm.c file) The other project files are available in their corresponding directories </big>
-
+```
 /* ========================================
  *
  * AUTHOR:      Andreas BOTH
@@ -943,6 +943,6 @@ void isr_pwm_ClearPending(void)
 }
 
 #endif /* End check for removal by optimization */
-
+```
 
 /* [] END OF FILE */
