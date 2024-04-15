@@ -1,0 +1,2106 @@
+ARM GAS  C:\Users\z004c8dn\AppData\Local\Temp\ccwCGOfd.s 			page 1
+
+
+   1              		.syntax unified
+   2              		.cpu cortex-m3
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 1
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.syntax unified
+  15              		.file	"isr_pwm.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.section	.text.isr_pwm_Interrupt,"ax",%progbits
+  20              		.align	2
+  21              		.global	isr_pwm_Interrupt
+  22              		.thumb
+  23              		.thumb_func
+  24              		.type	isr_pwm_Interrupt, %function
+  25              	isr_pwm_Interrupt:
+  26              	.LFB67:
+  27              		.file 1 "Generated_Source\\PSoC5\\isr_pwm.c"
+   1:Generated_Source\PSoC5/isr_pwm.c **** /*******************************************************************************
+   2:Generated_Source\PSoC5/isr_pwm.c **** * File Name: isr_pwm.c  
+   3:Generated_Source\PSoC5/isr_pwm.c **** * Version 1.70
+   4:Generated_Source\PSoC5/isr_pwm.c **** *
+   5:Generated_Source\PSoC5/isr_pwm.c **** *  Description:
+   6:Generated_Source\PSoC5/isr_pwm.c **** *   API for controlling the state of an interrupt.
+   7:Generated_Source\PSoC5/isr_pwm.c **** *   EDITED BY:   Andreas BOTH
+   8:Generated_Source\PSoC5/isr_pwm.c **** *   DATE:        2024-04-14
+   9:Generated_Source\PSoC5/isr_pwm.c **** *   COURSE ID:   tx00db04
+  10:Generated_Source\PSoC5/isr_pwm.c **** *   Description: PSoC course excercise 2, 
+  11:Generated_Source\PSoC5/isr_pwm.c **** *                Position control of a servo motor using PWM and interrupts
+  12:Generated_Source\PSoC5/isr_pwm.c **** *
+  13:Generated_Source\PSoC5/isr_pwm.c **** *  Note:
+  14:Generated_Source\PSoC5/isr_pwm.c **** *
+  15:Generated_Source\PSoC5/isr_pwm.c **** ********************************************************************************
+  16:Generated_Source\PSoC5/isr_pwm.c **** * Copyright 2008-2015, Cypress Semiconductor Corporation.  All rights reserved.
+  17:Generated_Source\PSoC5/isr_pwm.c **** * You may use this file only in accordance with the license, terms, conditions, 
+  18:Generated_Source\PSoC5/isr_pwm.c **** * disclaimers, and limitations in the end user license agreement accompanying 
+  19:Generated_Source\PSoC5/isr_pwm.c **** * the software package with which this file was provided.
+  20:Generated_Source\PSoC5/isr_pwm.c **** *******************************************************************************/
+  21:Generated_Source\PSoC5/isr_pwm.c **** 
+  22:Generated_Source\PSoC5/isr_pwm.c **** 
+  23:Generated_Source\PSoC5/isr_pwm.c **** #include <cydevice_trm.h>
+  24:Generated_Source\PSoC5/isr_pwm.c **** #include <CyLib.h>
+  25:Generated_Source\PSoC5/isr_pwm.c **** #include <isr_pwm.h>
+  26:Generated_Source\PSoC5/isr_pwm.c **** #include "cyapicallbacks.h"
+  27:Generated_Source\PSoC5/isr_pwm.c **** 
+  28:Generated_Source\PSoC5/isr_pwm.c **** #if !defined(isr_pwm__REMOVED) /* Check for removal by optimization */
+  29:Generated_Source\PSoC5/isr_pwm.c **** 
+  30:Generated_Source\PSoC5/isr_pwm.c **** /*******************************************************************************
+ARM GAS  C:\Users\z004c8dn\AppData\Local\Temp\ccwCGOfd.s 			page 2
+
+
+  31:Generated_Source\PSoC5/isr_pwm.c **** *  Place your includes, defines and code here 
+  32:Generated_Source\PSoC5/isr_pwm.c **** ********************************************************************************/
+  33:Generated_Source\PSoC5/isr_pwm.c **** /* `#START isr_pwm_intc` */
+  34:Generated_Source\PSoC5/isr_pwm.c ****     #include "project.h"
+  35:Generated_Source\PSoC5/isr_pwm.c ****     #include <stdio.h>
+  36:Generated_Source\PSoC5/isr_pwm.c ****     extern volatile int gTargetPosition;
+  37:Generated_Source\PSoC5/isr_pwm.c ****     extern volatile int gCurrentPosition;
+  38:Generated_Source\PSoC5/isr_pwm.c **** /* `#END` */
+  39:Generated_Source\PSoC5/isr_pwm.c **** 
+  40:Generated_Source\PSoC5/isr_pwm.c **** #ifndef CYINT_IRQ_BASE
+  41:Generated_Source\PSoC5/isr_pwm.c **** #define CYINT_IRQ_BASE      16
+  42:Generated_Source\PSoC5/isr_pwm.c **** #endif /* CYINT_IRQ_BASE */
+  43:Generated_Source\PSoC5/isr_pwm.c **** #ifndef CYINT_VECT_TABLE
+  44:Generated_Source\PSoC5/isr_pwm.c **** #define CYINT_VECT_TABLE    ((cyisraddress **) CYREG_NVIC_VECT_OFFSET)
+  45:Generated_Source\PSoC5/isr_pwm.c **** #endif /* CYINT_VECT_TABLE */
+  46:Generated_Source\PSoC5/isr_pwm.c **** 
+  47:Generated_Source\PSoC5/isr_pwm.c **** /* Declared in startup, used to set unused interrupts to. */
+  48:Generated_Source\PSoC5/isr_pwm.c **** CY_ISR_PROTO(IntDefaultHandler);
+  49:Generated_Source\PSoC5/isr_pwm.c **** 
+  50:Generated_Source\PSoC5/isr_pwm.c **** 
+  51:Generated_Source\PSoC5/isr_pwm.c **** /*******************************************************************************
+  52:Generated_Source\PSoC5/isr_pwm.c **** * Function Name: isr_pwm_Start
+  53:Generated_Source\PSoC5/isr_pwm.c **** ********************************************************************************
+  54:Generated_Source\PSoC5/isr_pwm.c **** *
+  55:Generated_Source\PSoC5/isr_pwm.c **** * Summary:
+  56:Generated_Source\PSoC5/isr_pwm.c **** *  Set up the interrupt and enable it. This function disables the interrupt, 
+  57:Generated_Source\PSoC5/isr_pwm.c **** *  sets the default interrupt vector, sets the priority from the value in the
+  58:Generated_Source\PSoC5/isr_pwm.c **** *  Design Wide Resources Interrupt Editor, then enables the interrupt to the 
+  59:Generated_Source\PSoC5/isr_pwm.c **** *  interrupt controller.
+  60:Generated_Source\PSoC5/isr_pwm.c **** *
+  61:Generated_Source\PSoC5/isr_pwm.c **** * Parameters:  
+  62:Generated_Source\PSoC5/isr_pwm.c **** *   None
+  63:Generated_Source\PSoC5/isr_pwm.c **** *
+  64:Generated_Source\PSoC5/isr_pwm.c **** * Return:
+  65:Generated_Source\PSoC5/isr_pwm.c **** *   None
+  66:Generated_Source\PSoC5/isr_pwm.c **** *
+  67:Generated_Source\PSoC5/isr_pwm.c **** *******************************************************************************/
+  68:Generated_Source\PSoC5/isr_pwm.c **** void isr_pwm_Start(void)
+  69:Generated_Source\PSoC5/isr_pwm.c **** {
+  70:Generated_Source\PSoC5/isr_pwm.c ****     /* For all we know the interrupt is active. */
+  71:Generated_Source\PSoC5/isr_pwm.c ****     isr_pwm_Disable();
+  72:Generated_Source\PSoC5/isr_pwm.c **** 
+  73:Generated_Source\PSoC5/isr_pwm.c ****     /* Set the ISR to point to the isr_pwm Interrupt. */
+  74:Generated_Source\PSoC5/isr_pwm.c ****     isr_pwm_SetVector(&isr_pwm_Interrupt);
+  75:Generated_Source\PSoC5/isr_pwm.c **** 
+  76:Generated_Source\PSoC5/isr_pwm.c ****     /* Set the priority. */
+  77:Generated_Source\PSoC5/isr_pwm.c ****     isr_pwm_SetPriority((uint8)isr_pwm_INTC_PRIOR_NUMBER);
+  78:Generated_Source\PSoC5/isr_pwm.c **** 
+  79:Generated_Source\PSoC5/isr_pwm.c ****     /* Enable it. */
+  80:Generated_Source\PSoC5/isr_pwm.c ****     isr_pwm_Enable();
+  81:Generated_Source\PSoC5/isr_pwm.c **** }
+  82:Generated_Source\PSoC5/isr_pwm.c **** 
+  83:Generated_Source\PSoC5/isr_pwm.c **** 
+  84:Generated_Source\PSoC5/isr_pwm.c **** /*******************************************************************************
+  85:Generated_Source\PSoC5/isr_pwm.c **** * Function Name: isr_pwm_StartEx
+  86:Generated_Source\PSoC5/isr_pwm.c **** ********************************************************************************
+  87:Generated_Source\PSoC5/isr_pwm.c **** *
+ARM GAS  C:\Users\z004c8dn\AppData\Local\Temp\ccwCGOfd.s 			page 3
+
+
+  88:Generated_Source\PSoC5/isr_pwm.c **** * Summary:
+  89:Generated_Source\PSoC5/isr_pwm.c **** *  Sets up the interrupt and enables it. This function disables the interrupt,
+  90:Generated_Source\PSoC5/isr_pwm.c **** *  sets the interrupt vector based on the address passed in, sets the priority 
+  91:Generated_Source\PSoC5/isr_pwm.c **** *  from the value in the Design Wide Resources Interrupt Editor, then enables 
+  92:Generated_Source\PSoC5/isr_pwm.c **** *  the interrupt to the interrupt controller.
+  93:Generated_Source\PSoC5/isr_pwm.c **** *  
+  94:Generated_Source\PSoC5/isr_pwm.c **** *  When defining ISR functions, the CY_ISR and CY_ISR_PROTO macros should be 
+  95:Generated_Source\PSoC5/isr_pwm.c **** *  used to provide consistent definition across compilers:
+  96:Generated_Source\PSoC5/isr_pwm.c **** *  
+  97:Generated_Source\PSoC5/isr_pwm.c **** *  Function definition example:
+  98:Generated_Source\PSoC5/isr_pwm.c **** *   CY_ISR(MyISR)
+  99:Generated_Source\PSoC5/isr_pwm.c **** *   {
+ 100:Generated_Source\PSoC5/isr_pwm.c **** *   }
+ 101:Generated_Source\PSoC5/isr_pwm.c **** *   Function prototype example:
+ 102:Generated_Source\PSoC5/isr_pwm.c **** *   CY_ISR_PROTO(MyISR);
+ 103:Generated_Source\PSoC5/isr_pwm.c **** *
+ 104:Generated_Source\PSoC5/isr_pwm.c **** * Parameters:  
+ 105:Generated_Source\PSoC5/isr_pwm.c **** *   address: Address of the ISR to set in the interrupt vector table.
+ 106:Generated_Source\PSoC5/isr_pwm.c **** *
+ 107:Generated_Source\PSoC5/isr_pwm.c **** * Return:
+ 108:Generated_Source\PSoC5/isr_pwm.c **** *   None
+ 109:Generated_Source\PSoC5/isr_pwm.c **** *
+ 110:Generated_Source\PSoC5/isr_pwm.c **** *******************************************************************************/
+ 111:Generated_Source\PSoC5/isr_pwm.c **** void isr_pwm_StartEx(cyisraddress address)
+ 112:Generated_Source\PSoC5/isr_pwm.c **** {
+ 113:Generated_Source\PSoC5/isr_pwm.c ****     /* For all we know the interrupt is active. */
+ 114:Generated_Source\PSoC5/isr_pwm.c ****     isr_pwm_Disable();
+ 115:Generated_Source\PSoC5/isr_pwm.c **** 
+ 116:Generated_Source\PSoC5/isr_pwm.c ****     /* Set the ISR to point to the isr_pwm Interrupt. */
+ 117:Generated_Source\PSoC5/isr_pwm.c ****     isr_pwm_SetVector(address);
+ 118:Generated_Source\PSoC5/isr_pwm.c **** 
+ 119:Generated_Source\PSoC5/isr_pwm.c ****     /* Set the priority. */
+ 120:Generated_Source\PSoC5/isr_pwm.c ****     isr_pwm_SetPriority((uint8)isr_pwm_INTC_PRIOR_NUMBER);
+ 121:Generated_Source\PSoC5/isr_pwm.c **** 
+ 122:Generated_Source\PSoC5/isr_pwm.c ****     /* Enable it. */
+ 123:Generated_Source\PSoC5/isr_pwm.c ****     isr_pwm_Enable();
+ 124:Generated_Source\PSoC5/isr_pwm.c **** }
+ 125:Generated_Source\PSoC5/isr_pwm.c **** 
+ 126:Generated_Source\PSoC5/isr_pwm.c **** 
+ 127:Generated_Source\PSoC5/isr_pwm.c **** /*******************************************************************************
+ 128:Generated_Source\PSoC5/isr_pwm.c **** * Function Name: isr_pwm_Stop
+ 129:Generated_Source\PSoC5/isr_pwm.c **** ********************************************************************************
+ 130:Generated_Source\PSoC5/isr_pwm.c **** *
+ 131:Generated_Source\PSoC5/isr_pwm.c **** * Summary:
+ 132:Generated_Source\PSoC5/isr_pwm.c **** *   Disables and removes the interrupt.
+ 133:Generated_Source\PSoC5/isr_pwm.c **** *
+ 134:Generated_Source\PSoC5/isr_pwm.c **** * Parameters:  
+ 135:Generated_Source\PSoC5/isr_pwm.c **** *   None
+ 136:Generated_Source\PSoC5/isr_pwm.c **** *
+ 137:Generated_Source\PSoC5/isr_pwm.c **** * Return:
+ 138:Generated_Source\PSoC5/isr_pwm.c **** *   None
+ 139:Generated_Source\PSoC5/isr_pwm.c **** *
+ 140:Generated_Source\PSoC5/isr_pwm.c **** *******************************************************************************/
+ 141:Generated_Source\PSoC5/isr_pwm.c **** void isr_pwm_Stop(void)
+ 142:Generated_Source\PSoC5/isr_pwm.c **** {
+ 143:Generated_Source\PSoC5/isr_pwm.c ****     /* Disable this interrupt. */
+ 144:Generated_Source\PSoC5/isr_pwm.c ****     isr_pwm_Disable();
+ARM GAS  C:\Users\z004c8dn\AppData\Local\Temp\ccwCGOfd.s 			page 4
+
+
+ 145:Generated_Source\PSoC5/isr_pwm.c **** 
+ 146:Generated_Source\PSoC5/isr_pwm.c ****     /* Set the ISR to point to the passive one. */
+ 147:Generated_Source\PSoC5/isr_pwm.c ****     isr_pwm_SetVector(&IntDefaultHandler);
+ 148:Generated_Source\PSoC5/isr_pwm.c **** }
+ 149:Generated_Source\PSoC5/isr_pwm.c **** 
+ 150:Generated_Source\PSoC5/isr_pwm.c **** 
+ 151:Generated_Source\PSoC5/isr_pwm.c **** /*******************************************************************************
+ 152:Generated_Source\PSoC5/isr_pwm.c **** * Function Name: isr_pwm_Interrupt
+ 153:Generated_Source\PSoC5/isr_pwm.c **** ********************************************************************************
+ 154:Generated_Source\PSoC5/isr_pwm.c **** *
+ 155:Generated_Source\PSoC5/isr_pwm.c **** * Summary:
+ 156:Generated_Source\PSoC5/isr_pwm.c **** *   The default Interrupt Service Routine for isr_pwm.
+ 157:Generated_Source\PSoC5/isr_pwm.c **** *
+ 158:Generated_Source\PSoC5/isr_pwm.c **** *   Add custom code between the coments to keep the next version of this file
+ 159:Generated_Source\PSoC5/isr_pwm.c **** *   from over writting your code.
+ 160:Generated_Source\PSoC5/isr_pwm.c **** *
+ 161:Generated_Source\PSoC5/isr_pwm.c **** * Parameters:  
+ 162:Generated_Source\PSoC5/isr_pwm.c **** *
+ 163:Generated_Source\PSoC5/isr_pwm.c **** * Return:
+ 164:Generated_Source\PSoC5/isr_pwm.c **** *   None
+ 165:Generated_Source\PSoC5/isr_pwm.c **** *
+ 166:Generated_Source\PSoC5/isr_pwm.c **** *******************************************************************************/
+ 167:Generated_Source\PSoC5/isr_pwm.c **** CY_ISR(isr_pwm_Interrupt)
+ 168:Generated_Source\PSoC5/isr_pwm.c **** {
+  28              		.loc 1 168 0
+  29              		.cfi_startproc
+  30              		@ args = 0, pretend = 0, frame = 0
+  31              		@ frame_needed = 0, uses_anonymous_args = 0
+  32 0000 08B5     		push	{r3, lr}
+  33              		.cfi_def_cfa_offset 8
+  34              		.cfi_offset 3, -8
+  35              		.cfi_offset 14, -4
+ 169:Generated_Source\PSoC5/isr_pwm.c ****     #ifdef isr_pwm_INTERRUPT_INTERRUPT_CALLBACK
+ 170:Generated_Source\PSoC5/isr_pwm.c ****         isr_pwm_Interrupt_InterruptCallback();
+ 171:Generated_Source\PSoC5/isr_pwm.c ****     #endif /* isr_pwm_INTERRUPT_INTERRUPT_CALLBACK */ 
+ 172:Generated_Source\PSoC5/isr_pwm.c **** 
+ 173:Generated_Source\PSoC5/isr_pwm.c ****     /*  Place your Interrupt code here. */
+ 174:Generated_Source\PSoC5/isr_pwm.c ****     /* `#START isr_pwm_Interrupt` */
+ 175:Generated_Source\PSoC5/isr_pwm.c ****         CYGlobalIntDisable
+  36              		.loc 1 175 0
+  37              		.syntax unified
+  38              	@ 175 "Generated_Source\PSoC5\isr_pwm.c" 1
+  39 0002 72B6     		CPSID   i
+  40              	@ 0 "" 2
+ 176:Generated_Source\PSoC5/isr_pwm.c ****         
+ 177:Generated_Source\PSoC5/isr_pwm.c ****         //UART_PutString("cycle done... starting next");    //debug functions
+ 178:Generated_Source\PSoC5/isr_pwm.c ****         //UART_PutCRLF(0);                                  //debug functions
+ 179:Generated_Source\PSoC5/isr_pwm.c ****         
+ 180:Generated_Source\PSoC5/isr_pwm.c ****         if(gCurrentPosition < gTargetPosition) //increase gradually
+  41              		.loc 1 180 0
+  42              		.thumb
+  43              		.syntax unified
+  44 0004 0E4B     		ldr	r3, .L6
+  45 0006 1A68     		ldr	r2, [r3]
+  46 0008 0E4B     		ldr	r3, .L6+4
+  47 000a 1B68     		ldr	r3, [r3]
+  48 000c 9A42     		cmp	r2, r3
+ARM GAS  C:\Users\z004c8dn\AppData\Local\Temp\ccwCGOfd.s 			page 5
+
+
+  49 000e 04DA     		bge	.L2
+ 181:Generated_Source\PSoC5/isr_pwm.c ****         {
+ 182:Generated_Source\PSoC5/isr_pwm.c ****             gCurrentPosition +=10;
+  50              		.loc 1 182 0
+  51 0010 0B4A     		ldr	r2, .L6
+  52 0012 1368     		ldr	r3, [r2]
+  53 0014 0A33     		adds	r3, r3, #10
+  54 0016 1360     		str	r3, [r2]
+  55 0018 0DE0     		b	.L3
+  56              	.L2:
+ 183:Generated_Source\PSoC5/isr_pwm.c ****         } 
+ 184:Generated_Source\PSoC5/isr_pwm.c ****         else if(gCurrentPosition> gTargetPosition) //decreasy gradually
+  57              		.loc 1 184 0
+  58 001a 094B     		ldr	r3, .L6
+  59 001c 1A68     		ldr	r2, [r3]
+  60 001e 094B     		ldr	r3, .L6+4
+  61 0020 1B68     		ldr	r3, [r3]
+  62 0022 9A42     		cmp	r2, r3
+  63 0024 04DD     		ble	.L4
+ 185:Generated_Source\PSoC5/isr_pwm.c ****         {
+ 186:Generated_Source\PSoC5/isr_pwm.c ****             gCurrentPosition -=10;
+  64              		.loc 1 186 0
+  65 0026 064A     		ldr	r2, .L6
+  66 0028 1368     		ldr	r3, [r2]
+  67 002a 0A3B     		subs	r3, r3, #10
+  68 002c 1360     		str	r3, [r2]
+  69 002e 02E0     		b	.L3
+  70              	.L4:
+ 187:Generated_Source\PSoC5/isr_pwm.c ****         }
+ 188:Generated_Source\PSoC5/isr_pwm.c ****         else
+ 189:Generated_Source\PSoC5/isr_pwm.c ****         {
+ 190:Generated_Source\PSoC5/isr_pwm.c ****             gCurrentPosition =gCurrentPosition; //no need for change
+  71              		.loc 1 190 0
+  72 0030 034B     		ldr	r3, .L6
+  73 0032 1A68     		ldr	r2, [r3]
+  74 0034 1A60     		str	r2, [r3]
+  75              	.L3:
+ 191:Generated_Source\PSoC5/isr_pwm.c ****         }
+ 192:Generated_Source\PSoC5/isr_pwm.c ****         
+ 193:Generated_Source\PSoC5/isr_pwm.c ****         PWM1_ReadStatusRegister();
+  76              		.loc 1 193 0
+  77 0036 FFF7FEFF 		bl	PWM1_ReadStatusRegister
+  78              	.LVL0:
+ 194:Generated_Source\PSoC5/isr_pwm.c ****         CYGlobalIntEnable
+  79              		.loc 1 194 0
+  80              		.syntax unified
+  81              	@ 194 "Generated_Source\PSoC5\isr_pwm.c" 1
+  82 003a 62B6     		CPSIE   i
+  83              	@ 0 "" 2
+  84              		.thumb
+  85              		.syntax unified
+  86 003c 08BD     		pop	{r3, pc}
+  87              	.L7:
+  88 003e 00BF     		.align	2
+  89              	.L6:
+  90 0040 00000000 		.word	gCurrentPosition
+  91 0044 00000000 		.word	gTargetPosition
+ARM GAS  C:\Users\z004c8dn\AppData\Local\Temp\ccwCGOfd.s 			page 6
+
+
+  92              		.cfi_endproc
+  93              	.LFE67:
+  94              		.size	isr_pwm_Interrupt, .-isr_pwm_Interrupt
+  95              		.section	.text.isr_pwm_SetVector,"ax",%progbits
+  96              		.align	2
+  97              		.global	isr_pwm_SetVector
+  98              		.thumb
+  99              		.thumb_func
+ 100              		.type	isr_pwm_SetVector, %function
+ 101              	isr_pwm_SetVector:
+ 102              	.LFB68:
+ 195:Generated_Source\PSoC5/isr_pwm.c ****     /* `#END` */
+ 196:Generated_Source\PSoC5/isr_pwm.c **** }
+ 197:Generated_Source\PSoC5/isr_pwm.c **** 
+ 198:Generated_Source\PSoC5/isr_pwm.c **** 
+ 199:Generated_Source\PSoC5/isr_pwm.c **** /*******************************************************************************
+ 200:Generated_Source\PSoC5/isr_pwm.c **** * Function Name: isr_pwm_SetVector
+ 201:Generated_Source\PSoC5/isr_pwm.c **** ********************************************************************************
+ 202:Generated_Source\PSoC5/isr_pwm.c **** *
+ 203:Generated_Source\PSoC5/isr_pwm.c **** * Summary:
+ 204:Generated_Source\PSoC5/isr_pwm.c **** *   Change the ISR vector for the Interrupt. Note calling isr_pwm_Start
+ 205:Generated_Source\PSoC5/isr_pwm.c **** *   will override any effect this method would have had. To set the vector 
+ 206:Generated_Source\PSoC5/isr_pwm.c **** *   before the component has been started use isr_pwm_StartEx instead.
+ 207:Generated_Source\PSoC5/isr_pwm.c **** * 
+ 208:Generated_Source\PSoC5/isr_pwm.c **** *   When defining ISR functions, the CY_ISR and CY_ISR_PROTO macros should be 
+ 209:Generated_Source\PSoC5/isr_pwm.c **** *   used to provide consistent definition across compilers:
+ 210:Generated_Source\PSoC5/isr_pwm.c **** *
+ 211:Generated_Source\PSoC5/isr_pwm.c **** *   Function definition example:
+ 212:Generated_Source\PSoC5/isr_pwm.c **** *   CY_ISR(MyISR)
+ 213:Generated_Source\PSoC5/isr_pwm.c **** *   {
+ 214:Generated_Source\PSoC5/isr_pwm.c **** *   }
+ 215:Generated_Source\PSoC5/isr_pwm.c **** *
+ 216:Generated_Source\PSoC5/isr_pwm.c **** *   Function prototype example:
+ 217:Generated_Source\PSoC5/isr_pwm.c **** *     CY_ISR_PROTO(MyISR);
+ 218:Generated_Source\PSoC5/isr_pwm.c **** *
+ 219:Generated_Source\PSoC5/isr_pwm.c **** * Parameters:
+ 220:Generated_Source\PSoC5/isr_pwm.c **** *   address: Address of the ISR to set in the interrupt vector table.
+ 221:Generated_Source\PSoC5/isr_pwm.c **** *
+ 222:Generated_Source\PSoC5/isr_pwm.c **** * Return:
+ 223:Generated_Source\PSoC5/isr_pwm.c **** *   None
+ 224:Generated_Source\PSoC5/isr_pwm.c **** *
+ 225:Generated_Source\PSoC5/isr_pwm.c **** *******************************************************************************/
+ 226:Generated_Source\PSoC5/isr_pwm.c **** void isr_pwm_SetVector(cyisraddress address)
+ 227:Generated_Source\PSoC5/isr_pwm.c **** {
+ 103              		.loc 1 227 0
+ 104              		.cfi_startproc
+ 105              		@ args = 0, pretend = 0, frame = 0
+ 106              		@ frame_needed = 0, uses_anonymous_args = 0
+ 107              		@ link register save eliminated.
+ 108              	.LVL1:
+ 228:Generated_Source\PSoC5/isr_pwm.c ****     cyisraddress * ramVectorTable;
+ 229:Generated_Source\PSoC5/isr_pwm.c **** 
+ 230:Generated_Source\PSoC5/isr_pwm.c ****     ramVectorTable = (cyisraddress *) *CYINT_VECT_TABLE;
+ 109              		.loc 1 230 0
+ 110 0000 014B     		ldr	r3, .L9
+ 111 0002 1B68     		ldr	r3, [r3]
+ 112              	.LVL2:
+ARM GAS  C:\Users\z004c8dn\AppData\Local\Temp\ccwCGOfd.s 			page 7
+
+
+ 231:Generated_Source\PSoC5/isr_pwm.c **** 
+ 232:Generated_Source\PSoC5/isr_pwm.c ****     ramVectorTable[CYINT_IRQ_BASE + (uint32)isr_pwm__INTC_NUMBER] = address;
+ 113              		.loc 1 232 0
+ 114 0004 1864     		str	r0, [r3, #64]
+ 115 0006 7047     		bx	lr
+ 116              	.L10:
+ 117              		.align	2
+ 118              	.L9:
+ 119 0008 08ED00E0 		.word	-536810232
+ 120              		.cfi_endproc
+ 121              	.LFE68:
+ 122              		.size	isr_pwm_SetVector, .-isr_pwm_SetVector
+ 123              		.section	.text.isr_pwm_GetVector,"ax",%progbits
+ 124              		.align	2
+ 125              		.global	isr_pwm_GetVector
+ 126              		.thumb
+ 127              		.thumb_func
+ 128              		.type	isr_pwm_GetVector, %function
+ 129              	isr_pwm_GetVector:
+ 130              	.LFB69:
+ 233:Generated_Source\PSoC5/isr_pwm.c **** }
+ 234:Generated_Source\PSoC5/isr_pwm.c **** 
+ 235:Generated_Source\PSoC5/isr_pwm.c **** 
+ 236:Generated_Source\PSoC5/isr_pwm.c **** /*******************************************************************************
+ 237:Generated_Source\PSoC5/isr_pwm.c **** * Function Name: isr_pwm_GetVector
+ 238:Generated_Source\PSoC5/isr_pwm.c **** ********************************************************************************
+ 239:Generated_Source\PSoC5/isr_pwm.c **** *
+ 240:Generated_Source\PSoC5/isr_pwm.c **** * Summary:
+ 241:Generated_Source\PSoC5/isr_pwm.c **** *   Gets the "address" of the current ISR vector for the Interrupt.
+ 242:Generated_Source\PSoC5/isr_pwm.c **** *
+ 243:Generated_Source\PSoC5/isr_pwm.c **** * Parameters:
+ 244:Generated_Source\PSoC5/isr_pwm.c **** *   None
+ 245:Generated_Source\PSoC5/isr_pwm.c **** *
+ 246:Generated_Source\PSoC5/isr_pwm.c **** * Return:
+ 247:Generated_Source\PSoC5/isr_pwm.c **** *   Address of the ISR in the interrupt vector table.
+ 248:Generated_Source\PSoC5/isr_pwm.c **** *
+ 249:Generated_Source\PSoC5/isr_pwm.c **** *******************************************************************************/
+ 250:Generated_Source\PSoC5/isr_pwm.c **** cyisraddress isr_pwm_GetVector(void)
+ 251:Generated_Source\PSoC5/isr_pwm.c **** {
+ 131              		.loc 1 251 0
+ 132              		.cfi_startproc
+ 133              		@ args = 0, pretend = 0, frame = 0
+ 134              		@ frame_needed = 0, uses_anonymous_args = 0
+ 135              		@ link register save eliminated.
+ 252:Generated_Source\PSoC5/isr_pwm.c ****     cyisraddress * ramVectorTable;
+ 253:Generated_Source\PSoC5/isr_pwm.c **** 
+ 254:Generated_Source\PSoC5/isr_pwm.c ****     ramVectorTable = (cyisraddress *) *CYINT_VECT_TABLE;
+ 136              		.loc 1 254 0
+ 137 0000 014B     		ldr	r3, .L12
+ 138 0002 1B68     		ldr	r3, [r3]
+ 139              	.LVL3:
+ 255:Generated_Source\PSoC5/isr_pwm.c **** 
+ 256:Generated_Source\PSoC5/isr_pwm.c ****     return ramVectorTable[CYINT_IRQ_BASE + (uint32)isr_pwm__INTC_NUMBER];
+ 257:Generated_Source\PSoC5/isr_pwm.c **** }
+ 140              		.loc 1 257 0
+ 141 0004 186C     		ldr	r0, [r3, #64]
+ 142 0006 7047     		bx	lr
+ARM GAS  C:\Users\z004c8dn\AppData\Local\Temp\ccwCGOfd.s 			page 8
+
+
+ 143              	.L13:
+ 144              		.align	2
+ 145              	.L12:
+ 146 0008 08ED00E0 		.word	-536810232
+ 147              		.cfi_endproc
+ 148              	.LFE69:
+ 149              		.size	isr_pwm_GetVector, .-isr_pwm_GetVector
+ 150              		.section	.text.isr_pwm_SetPriority,"ax",%progbits
+ 151              		.align	2
+ 152              		.global	isr_pwm_SetPriority
+ 153              		.thumb
+ 154              		.thumb_func
+ 155              		.type	isr_pwm_SetPriority, %function
+ 156              	isr_pwm_SetPriority:
+ 157              	.LFB70:
+ 258:Generated_Source\PSoC5/isr_pwm.c **** 
+ 259:Generated_Source\PSoC5/isr_pwm.c **** 
+ 260:Generated_Source\PSoC5/isr_pwm.c **** /*******************************************************************************
+ 261:Generated_Source\PSoC5/isr_pwm.c **** * Function Name: isr_pwm_SetPriority
+ 262:Generated_Source\PSoC5/isr_pwm.c **** ********************************************************************************
+ 263:Generated_Source\PSoC5/isr_pwm.c **** *
+ 264:Generated_Source\PSoC5/isr_pwm.c **** * Summary:
+ 265:Generated_Source\PSoC5/isr_pwm.c **** *   Sets the Priority of the Interrupt. 
+ 266:Generated_Source\PSoC5/isr_pwm.c **** *
+ 267:Generated_Source\PSoC5/isr_pwm.c **** *   Note calling isr_pwm_Start or isr_pwm_StartEx will 
+ 268:Generated_Source\PSoC5/isr_pwm.c **** *   override any effect this API would have had. This API should only be called
+ 269:Generated_Source\PSoC5/isr_pwm.c **** *   after isr_pwm_Start or isr_pwm_StartEx has been called. 
+ 270:Generated_Source\PSoC5/isr_pwm.c **** *   To set the initial priority for the component, use the Design-Wide Resources
+ 271:Generated_Source\PSoC5/isr_pwm.c **** *   Interrupt Editor.
+ 272:Generated_Source\PSoC5/isr_pwm.c **** *
+ 273:Generated_Source\PSoC5/isr_pwm.c **** *   Note This API has no effect on Non-maskable interrupt NMI).
+ 274:Generated_Source\PSoC5/isr_pwm.c **** *
+ 275:Generated_Source\PSoC5/isr_pwm.c **** * Parameters:
+ 276:Generated_Source\PSoC5/isr_pwm.c **** *   priority: Priority of the interrupt, 0 being the highest priority
+ 277:Generated_Source\PSoC5/isr_pwm.c **** *             PSoC 3 and PSoC 5LP: Priority is from 0 to 7.
+ 278:Generated_Source\PSoC5/isr_pwm.c **** *             PSoC 4: Priority is from 0 to 3.
+ 279:Generated_Source\PSoC5/isr_pwm.c **** *
+ 280:Generated_Source\PSoC5/isr_pwm.c **** * Return:
+ 281:Generated_Source\PSoC5/isr_pwm.c **** *   None
+ 282:Generated_Source\PSoC5/isr_pwm.c **** *
+ 283:Generated_Source\PSoC5/isr_pwm.c **** *******************************************************************************/
+ 284:Generated_Source\PSoC5/isr_pwm.c **** void isr_pwm_SetPriority(uint8 priority)
+ 285:Generated_Source\PSoC5/isr_pwm.c **** {
+ 158              		.loc 1 285 0
+ 159              		.cfi_startproc
+ 160              		@ args = 0, pretend = 0, frame = 0
+ 161              		@ frame_needed = 0, uses_anonymous_args = 0
+ 162              		@ link register save eliminated.
+ 163              	.LVL4:
+ 286:Generated_Source\PSoC5/isr_pwm.c ****     *isr_pwm_INTC_PRIOR = priority << 5;
+ 164              		.loc 1 286 0
+ 165 0000 4001     		lsls	r0, r0, #5
+ 166              	.LVL5:
+ 167 0002 C0B2     		uxtb	r0, r0
+ 168 0004 014B     		ldr	r3, .L15
+ 169 0006 1870     		strb	r0, [r3]
+ 170 0008 7047     		bx	lr
+ARM GAS  C:\Users\z004c8dn\AppData\Local\Temp\ccwCGOfd.s 			page 9
+
+
+ 171              	.L16:
+ 172 000a 00BF     		.align	2
+ 173              	.L15:
+ 174 000c 00E400E0 		.word	-536812544
+ 175              		.cfi_endproc
+ 176              	.LFE70:
+ 177              		.size	isr_pwm_SetPriority, .-isr_pwm_SetPriority
+ 178              		.section	.text.isr_pwm_GetPriority,"ax",%progbits
+ 179              		.align	2
+ 180              		.global	isr_pwm_GetPriority
+ 181              		.thumb
+ 182              		.thumb_func
+ 183              		.type	isr_pwm_GetPriority, %function
+ 184              	isr_pwm_GetPriority:
+ 185              	.LFB71:
+ 287:Generated_Source\PSoC5/isr_pwm.c **** }
+ 288:Generated_Source\PSoC5/isr_pwm.c **** 
+ 289:Generated_Source\PSoC5/isr_pwm.c **** 
+ 290:Generated_Source\PSoC5/isr_pwm.c **** /*******************************************************************************
+ 291:Generated_Source\PSoC5/isr_pwm.c **** * Function Name: isr_pwm_GetPriority
+ 292:Generated_Source\PSoC5/isr_pwm.c **** ********************************************************************************
+ 293:Generated_Source\PSoC5/isr_pwm.c **** *
+ 294:Generated_Source\PSoC5/isr_pwm.c **** * Summary:
+ 295:Generated_Source\PSoC5/isr_pwm.c **** *   Gets the Priority of the Interrupt.
+ 296:Generated_Source\PSoC5/isr_pwm.c **** *
+ 297:Generated_Source\PSoC5/isr_pwm.c **** * Parameters:
+ 298:Generated_Source\PSoC5/isr_pwm.c **** *   None
+ 299:Generated_Source\PSoC5/isr_pwm.c **** *
+ 300:Generated_Source\PSoC5/isr_pwm.c **** * Return:
+ 301:Generated_Source\PSoC5/isr_pwm.c **** *   Priority of the interrupt, 0 being the highest priority
+ 302:Generated_Source\PSoC5/isr_pwm.c **** *    PSoC 3 and PSoC 5LP: Priority is from 0 to 7.
+ 303:Generated_Source\PSoC5/isr_pwm.c **** *    PSoC 4: Priority is from 0 to 3.
+ 304:Generated_Source\PSoC5/isr_pwm.c **** *
+ 305:Generated_Source\PSoC5/isr_pwm.c **** *******************************************************************************/
+ 306:Generated_Source\PSoC5/isr_pwm.c **** uint8 isr_pwm_GetPriority(void)
+ 307:Generated_Source\PSoC5/isr_pwm.c **** {
+ 186              		.loc 1 307 0
+ 187              		.cfi_startproc
+ 188              		@ args = 0, pretend = 0, frame = 0
+ 189              		@ frame_needed = 0, uses_anonymous_args = 0
+ 190              		@ link register save eliminated.
+ 308:Generated_Source\PSoC5/isr_pwm.c ****     uint8 priority;
+ 309:Generated_Source\PSoC5/isr_pwm.c **** 
+ 310:Generated_Source\PSoC5/isr_pwm.c **** 
+ 311:Generated_Source\PSoC5/isr_pwm.c ****     priority = *isr_pwm_INTC_PRIOR >> 5;
+ 191              		.loc 1 311 0
+ 192 0000 014B     		ldr	r3, .L18
+ 193 0002 1878     		ldrb	r0, [r3]	@ zero_extendqisi2
+ 194              	.LVL6:
+ 312:Generated_Source\PSoC5/isr_pwm.c **** 
+ 313:Generated_Source\PSoC5/isr_pwm.c ****     return priority;
+ 314:Generated_Source\PSoC5/isr_pwm.c **** }
+ 195              		.loc 1 314 0
+ 196 0004 4009     		lsrs	r0, r0, #5
+ 197              	.LVL7:
+ 198 0006 7047     		bx	lr
+ 199              	.L19:
+ARM GAS  C:\Users\z004c8dn\AppData\Local\Temp\ccwCGOfd.s 			page 10
+
+
+ 200              		.align	2
+ 201              	.L18:
+ 202 0008 00E400E0 		.word	-536812544
+ 203              		.cfi_endproc
+ 204              	.LFE71:
+ 205              		.size	isr_pwm_GetPriority, .-isr_pwm_GetPriority
+ 206              		.section	.text.isr_pwm_Enable,"ax",%progbits
+ 207              		.align	2
+ 208              		.global	isr_pwm_Enable
+ 209              		.thumb
+ 210              		.thumb_func
+ 211              		.type	isr_pwm_Enable, %function
+ 212              	isr_pwm_Enable:
+ 213              	.LFB72:
+ 315:Generated_Source\PSoC5/isr_pwm.c **** 
+ 316:Generated_Source\PSoC5/isr_pwm.c **** 
+ 317:Generated_Source\PSoC5/isr_pwm.c **** /*******************************************************************************
+ 318:Generated_Source\PSoC5/isr_pwm.c **** * Function Name: isr_pwm_Enable
+ 319:Generated_Source\PSoC5/isr_pwm.c **** ********************************************************************************
+ 320:Generated_Source\PSoC5/isr_pwm.c **** *
+ 321:Generated_Source\PSoC5/isr_pwm.c **** * Summary:
+ 322:Generated_Source\PSoC5/isr_pwm.c **** *   Enables the interrupt to the interrupt controller. Do not call this function
+ 323:Generated_Source\PSoC5/isr_pwm.c **** *   unless ISR_Start() has been called or the functionality of the ISR_Start() 
+ 324:Generated_Source\PSoC5/isr_pwm.c **** *   function, which sets the vector and the priority, has been called.
+ 325:Generated_Source\PSoC5/isr_pwm.c **** *
+ 326:Generated_Source\PSoC5/isr_pwm.c **** * Parameters:
+ 327:Generated_Source\PSoC5/isr_pwm.c **** *   None
+ 328:Generated_Source\PSoC5/isr_pwm.c **** *
+ 329:Generated_Source\PSoC5/isr_pwm.c **** * Return:
+ 330:Generated_Source\PSoC5/isr_pwm.c **** *   None
+ 331:Generated_Source\PSoC5/isr_pwm.c **** *
+ 332:Generated_Source\PSoC5/isr_pwm.c **** *******************************************************************************/
+ 333:Generated_Source\PSoC5/isr_pwm.c **** void isr_pwm_Enable(void)
+ 334:Generated_Source\PSoC5/isr_pwm.c **** {
+ 214              		.loc 1 334 0
+ 215              		.cfi_startproc
+ 216              		@ args = 0, pretend = 0, frame = 0
+ 217              		@ frame_needed = 0, uses_anonymous_args = 0
+ 218              		@ link register save eliminated.
+ 335:Generated_Source\PSoC5/isr_pwm.c ****     /* Enable the general interrupt. */
+ 336:Generated_Source\PSoC5/isr_pwm.c ****     *isr_pwm_INTC_SET_EN = isr_pwm__INTC_MASK;
+ 219              		.loc 1 336 0
+ 220 0000 0122     		movs	r2, #1
+ 221 0002 014B     		ldr	r3, .L21
+ 222 0004 1A60     		str	r2, [r3]
+ 223 0006 7047     		bx	lr
+ 224              	.L22:
+ 225              		.align	2
+ 226              	.L21:
+ 227 0008 00E100E0 		.word	-536813312
+ 228              		.cfi_endproc
+ 229              	.LFE72:
+ 230              		.size	isr_pwm_Enable, .-isr_pwm_Enable
+ 231              		.section	.text.isr_pwm_GetState,"ax",%progbits
+ 232              		.align	2
+ 233              		.global	isr_pwm_GetState
+ 234              		.thumb
+ARM GAS  C:\Users\z004c8dn\AppData\Local\Temp\ccwCGOfd.s 			page 11
+
+
+ 235              		.thumb_func
+ 236              		.type	isr_pwm_GetState, %function
+ 237              	isr_pwm_GetState:
+ 238              	.LFB73:
+ 337:Generated_Source\PSoC5/isr_pwm.c **** }
+ 338:Generated_Source\PSoC5/isr_pwm.c **** 
+ 339:Generated_Source\PSoC5/isr_pwm.c **** 
+ 340:Generated_Source\PSoC5/isr_pwm.c **** /*******************************************************************************
+ 341:Generated_Source\PSoC5/isr_pwm.c **** * Function Name: isr_pwm_GetState
+ 342:Generated_Source\PSoC5/isr_pwm.c **** ********************************************************************************
+ 343:Generated_Source\PSoC5/isr_pwm.c **** *
+ 344:Generated_Source\PSoC5/isr_pwm.c **** * Summary:
+ 345:Generated_Source\PSoC5/isr_pwm.c **** *   Gets the state (enabled, disabled) of the Interrupt.
+ 346:Generated_Source\PSoC5/isr_pwm.c **** *
+ 347:Generated_Source\PSoC5/isr_pwm.c **** * Parameters:
+ 348:Generated_Source\PSoC5/isr_pwm.c **** *   None
+ 349:Generated_Source\PSoC5/isr_pwm.c **** *
+ 350:Generated_Source\PSoC5/isr_pwm.c **** * Return:
+ 351:Generated_Source\PSoC5/isr_pwm.c **** *   1 if enabled, 0 if disabled.
+ 352:Generated_Source\PSoC5/isr_pwm.c **** *
+ 353:Generated_Source\PSoC5/isr_pwm.c **** *******************************************************************************/
+ 354:Generated_Source\PSoC5/isr_pwm.c **** uint8 isr_pwm_GetState(void)
+ 355:Generated_Source\PSoC5/isr_pwm.c **** {
+ 239              		.loc 1 355 0
+ 240              		.cfi_startproc
+ 241              		@ args = 0, pretend = 0, frame = 0
+ 242              		@ frame_needed = 0, uses_anonymous_args = 0
+ 243              		@ link register save eliminated.
+ 356:Generated_Source\PSoC5/isr_pwm.c ****     /* Get the state of the general interrupt. */
+ 357:Generated_Source\PSoC5/isr_pwm.c ****     return ((*isr_pwm_INTC_SET_EN & (uint32)isr_pwm__INTC_MASK) != 0u) ? 1u:0u;
+ 244              		.loc 1 357 0
+ 245 0000 024B     		ldr	r3, .L24
+ 246 0002 1868     		ldr	r0, [r3]
+ 358:Generated_Source\PSoC5/isr_pwm.c **** }
+ 247              		.loc 1 358 0
+ 248 0004 00F00100 		and	r0, r0, #1
+ 249 0008 7047     		bx	lr
+ 250              	.L25:
+ 251 000a 00BF     		.align	2
+ 252              	.L24:
+ 253 000c 00E100E0 		.word	-536813312
+ 254              		.cfi_endproc
+ 255              	.LFE73:
+ 256              		.size	isr_pwm_GetState, .-isr_pwm_GetState
+ 257              		.section	.text.isr_pwm_Disable,"ax",%progbits
+ 258              		.align	2
+ 259              		.global	isr_pwm_Disable
+ 260              		.thumb
+ 261              		.thumb_func
+ 262              		.type	isr_pwm_Disable, %function
+ 263              	isr_pwm_Disable:
+ 264              	.LFB74:
+ 359:Generated_Source\PSoC5/isr_pwm.c **** 
+ 360:Generated_Source\PSoC5/isr_pwm.c **** 
+ 361:Generated_Source\PSoC5/isr_pwm.c **** /*******************************************************************************
+ 362:Generated_Source\PSoC5/isr_pwm.c **** * Function Name: isr_pwm_Disable
+ 363:Generated_Source\PSoC5/isr_pwm.c **** ********************************************************************************
+ARM GAS  C:\Users\z004c8dn\AppData\Local\Temp\ccwCGOfd.s 			page 12
+
+
+ 364:Generated_Source\PSoC5/isr_pwm.c **** *
+ 365:Generated_Source\PSoC5/isr_pwm.c **** * Summary:
+ 366:Generated_Source\PSoC5/isr_pwm.c **** *   Disables the Interrupt in the interrupt controller.
+ 367:Generated_Source\PSoC5/isr_pwm.c **** *
+ 368:Generated_Source\PSoC5/isr_pwm.c **** * Parameters:
+ 369:Generated_Source\PSoC5/isr_pwm.c **** *   None
+ 370:Generated_Source\PSoC5/isr_pwm.c **** *
+ 371:Generated_Source\PSoC5/isr_pwm.c **** * Return:
+ 372:Generated_Source\PSoC5/isr_pwm.c **** *   None
+ 373:Generated_Source\PSoC5/isr_pwm.c **** *
+ 374:Generated_Source\PSoC5/isr_pwm.c **** *******************************************************************************/
+ 375:Generated_Source\PSoC5/isr_pwm.c **** void isr_pwm_Disable(void)
+ 376:Generated_Source\PSoC5/isr_pwm.c **** {
+ 265              		.loc 1 376 0
+ 266              		.cfi_startproc
+ 267              		@ args = 0, pretend = 0, frame = 0
+ 268              		@ frame_needed = 0, uses_anonymous_args = 0
+ 269              		@ link register save eliminated.
+ 377:Generated_Source\PSoC5/isr_pwm.c ****     /* Disable the general interrupt. */
+ 378:Generated_Source\PSoC5/isr_pwm.c ****     *isr_pwm_INTC_CLR_EN = isr_pwm__INTC_MASK;
+ 270              		.loc 1 378 0
+ 271 0000 0122     		movs	r2, #1
+ 272 0002 014B     		ldr	r3, .L27
+ 273 0004 1A60     		str	r2, [r3]
+ 274 0006 7047     		bx	lr
+ 275              	.L28:
+ 276              		.align	2
+ 277              	.L27:
+ 278 0008 80E100E0 		.word	-536813184
+ 279              		.cfi_endproc
+ 280              	.LFE74:
+ 281              		.size	isr_pwm_Disable, .-isr_pwm_Disable
+ 282              		.section	.text.isr_pwm_Start,"ax",%progbits
+ 283              		.align	2
+ 284              		.global	isr_pwm_Start
+ 285              		.thumb
+ 286              		.thumb_func
+ 287              		.type	isr_pwm_Start, %function
+ 288              	isr_pwm_Start:
+ 289              	.LFB64:
+  69:Generated_Source\PSoC5/isr_pwm.c ****     /* For all we know the interrupt is active. */
+ 290              		.loc 1 69 0
+ 291              		.cfi_startproc
+ 292              		@ args = 0, pretend = 0, frame = 0
+ 293              		@ frame_needed = 0, uses_anonymous_args = 0
+ 294 0000 08B5     		push	{r3, lr}
+ 295              		.cfi_def_cfa_offset 8
+ 296              		.cfi_offset 3, -8
+ 297              		.cfi_offset 14, -4
+  71:Generated_Source\PSoC5/isr_pwm.c **** 
+ 298              		.loc 1 71 0
+ 299 0002 FFF7FEFF 		bl	isr_pwm_Disable
+ 300              	.LVL8:
+  74:Generated_Source\PSoC5/isr_pwm.c **** 
+ 301              		.loc 1 74 0
+ 302 0006 0448     		ldr	r0, .L31
+ 303 0008 FFF7FEFF 		bl	isr_pwm_SetVector
+ARM GAS  C:\Users\z004c8dn\AppData\Local\Temp\ccwCGOfd.s 			page 13
+
+
+ 304              	.LVL9:
+  77:Generated_Source\PSoC5/isr_pwm.c **** 
+ 305              		.loc 1 77 0
+ 306 000c 0720     		movs	r0, #7
+ 307 000e FFF7FEFF 		bl	isr_pwm_SetPriority
+ 308              	.LVL10:
+  80:Generated_Source\PSoC5/isr_pwm.c **** }
+ 309              		.loc 1 80 0
+ 310 0012 FFF7FEFF 		bl	isr_pwm_Enable
+ 311              	.LVL11:
+ 312 0016 08BD     		pop	{r3, pc}
+ 313              	.L32:
+ 314              		.align	2
+ 315              	.L31:
+ 316 0018 00000000 		.word	isr_pwm_Interrupt
+ 317              		.cfi_endproc
+ 318              	.LFE64:
+ 319              		.size	isr_pwm_Start, .-isr_pwm_Start
+ 320              		.section	.text.isr_pwm_StartEx,"ax",%progbits
+ 321              		.align	2
+ 322              		.global	isr_pwm_StartEx
+ 323              		.thumb
+ 324              		.thumb_func
+ 325              		.type	isr_pwm_StartEx, %function
+ 326              	isr_pwm_StartEx:
+ 327              	.LFB65:
+ 112:Generated_Source\PSoC5/isr_pwm.c ****     /* For all we know the interrupt is active. */
+ 328              		.loc 1 112 0
+ 329              		.cfi_startproc
+ 330              		@ args = 0, pretend = 0, frame = 0
+ 331              		@ frame_needed = 0, uses_anonymous_args = 0
+ 332              	.LVL12:
+ 333 0000 10B5     		push	{r4, lr}
+ 334              		.cfi_def_cfa_offset 8
+ 335              		.cfi_offset 4, -8
+ 336              		.cfi_offset 14, -4
+ 337 0002 0446     		mov	r4, r0
+ 114:Generated_Source\PSoC5/isr_pwm.c **** 
+ 338              		.loc 1 114 0
+ 339 0004 FFF7FEFF 		bl	isr_pwm_Disable
+ 340              	.LVL13:
+ 117:Generated_Source\PSoC5/isr_pwm.c **** 
+ 341              		.loc 1 117 0
+ 342 0008 2046     		mov	r0, r4
+ 343 000a FFF7FEFF 		bl	isr_pwm_SetVector
+ 344              	.LVL14:
+ 120:Generated_Source\PSoC5/isr_pwm.c **** 
+ 345              		.loc 1 120 0
+ 346 000e 0720     		movs	r0, #7
+ 347 0010 FFF7FEFF 		bl	isr_pwm_SetPriority
+ 348              	.LVL15:
+ 123:Generated_Source\PSoC5/isr_pwm.c **** }
+ 349              		.loc 1 123 0
+ 350 0014 FFF7FEFF 		bl	isr_pwm_Enable
+ 351              	.LVL16:
+ 352 0018 10BD     		pop	{r4, pc}
+ 353              		.cfi_endproc
+ARM GAS  C:\Users\z004c8dn\AppData\Local\Temp\ccwCGOfd.s 			page 14
+
+
+ 354              	.LFE65:
+ 355              		.size	isr_pwm_StartEx, .-isr_pwm_StartEx
+ 356 001a 00BF     		.section	.text.isr_pwm_Stop,"ax",%progbits
+ 357              		.align	2
+ 358              		.global	isr_pwm_Stop
+ 359              		.thumb
+ 360              		.thumb_func
+ 361              		.type	isr_pwm_Stop, %function
+ 362              	isr_pwm_Stop:
+ 363              	.LFB66:
+ 142:Generated_Source\PSoC5/isr_pwm.c ****     /* Disable this interrupt. */
+ 364              		.loc 1 142 0
+ 365              		.cfi_startproc
+ 366              		@ args = 0, pretend = 0, frame = 0
+ 367              		@ frame_needed = 0, uses_anonymous_args = 0
+ 368 0000 08B5     		push	{r3, lr}
+ 369              		.cfi_def_cfa_offset 8
+ 370              		.cfi_offset 3, -8
+ 371              		.cfi_offset 14, -4
+ 144:Generated_Source\PSoC5/isr_pwm.c **** 
+ 372              		.loc 1 144 0
+ 373 0002 FFF7FEFF 		bl	isr_pwm_Disable
+ 374              	.LVL17:
+ 147:Generated_Source\PSoC5/isr_pwm.c **** }
+ 375              		.loc 1 147 0
+ 376 0006 0248     		ldr	r0, .L37
+ 377 0008 FFF7FEFF 		bl	isr_pwm_SetVector
+ 378              	.LVL18:
+ 379 000c 08BD     		pop	{r3, pc}
+ 380              	.L38:
+ 381 000e 00BF     		.align	2
+ 382              	.L37:
+ 383 0010 00000000 		.word	IntDefaultHandler
+ 384              		.cfi_endproc
+ 385              	.LFE66:
+ 386              		.size	isr_pwm_Stop, .-isr_pwm_Stop
+ 387              		.section	.text.isr_pwm_SetPending,"ax",%progbits
+ 388              		.align	2
+ 389              		.global	isr_pwm_SetPending
+ 390              		.thumb
+ 391              		.thumb_func
+ 392              		.type	isr_pwm_SetPending, %function
+ 393              	isr_pwm_SetPending:
+ 394              	.LFB75:
+ 379:Generated_Source\PSoC5/isr_pwm.c **** }
+ 380:Generated_Source\PSoC5/isr_pwm.c **** 
+ 381:Generated_Source\PSoC5/isr_pwm.c **** 
+ 382:Generated_Source\PSoC5/isr_pwm.c **** /*******************************************************************************
+ 383:Generated_Source\PSoC5/isr_pwm.c **** * Function Name: isr_pwm_SetPending
+ 384:Generated_Source\PSoC5/isr_pwm.c **** ********************************************************************************
+ 385:Generated_Source\PSoC5/isr_pwm.c **** *
+ 386:Generated_Source\PSoC5/isr_pwm.c **** * Summary:
+ 387:Generated_Source\PSoC5/isr_pwm.c **** *   Causes the Interrupt to enter the pending state, a software method of
+ 388:Generated_Source\PSoC5/isr_pwm.c **** *   generating the interrupt.
+ 389:Generated_Source\PSoC5/isr_pwm.c **** *
+ 390:Generated_Source\PSoC5/isr_pwm.c **** * Parameters:
+ 391:Generated_Source\PSoC5/isr_pwm.c **** *   None
+ARM GAS  C:\Users\z004c8dn\AppData\Local\Temp\ccwCGOfd.s 			page 15
+
+
+ 392:Generated_Source\PSoC5/isr_pwm.c **** *
+ 393:Generated_Source\PSoC5/isr_pwm.c **** * Return:
+ 394:Generated_Source\PSoC5/isr_pwm.c **** *   None
+ 395:Generated_Source\PSoC5/isr_pwm.c **** *
+ 396:Generated_Source\PSoC5/isr_pwm.c **** * Side Effects:
+ 397:Generated_Source\PSoC5/isr_pwm.c **** *   If interrupts are enabled and the interrupt is set up properly, the ISR is
+ 398:Generated_Source\PSoC5/isr_pwm.c **** *   entered (depending on the priority of this interrupt and other pending 
+ 399:Generated_Source\PSoC5/isr_pwm.c **** *   interrupts).
+ 400:Generated_Source\PSoC5/isr_pwm.c **** *
+ 401:Generated_Source\PSoC5/isr_pwm.c **** *******************************************************************************/
+ 402:Generated_Source\PSoC5/isr_pwm.c **** void isr_pwm_SetPending(void)
+ 403:Generated_Source\PSoC5/isr_pwm.c **** {
+ 395              		.loc 1 403 0
+ 396              		.cfi_startproc
+ 397              		@ args = 0, pretend = 0, frame = 0
+ 398              		@ frame_needed = 0, uses_anonymous_args = 0
+ 399              		@ link register save eliminated.
+ 404:Generated_Source\PSoC5/isr_pwm.c ****     *isr_pwm_INTC_SET_PD = isr_pwm__INTC_MASK;
+ 400              		.loc 1 404 0
+ 401 0000 0122     		movs	r2, #1
+ 402 0002 014B     		ldr	r3, .L40
+ 403 0004 1A60     		str	r2, [r3]
+ 404 0006 7047     		bx	lr
+ 405              	.L41:
+ 406              		.align	2
+ 407              	.L40:
+ 408 0008 00E200E0 		.word	-536813056
+ 409              		.cfi_endproc
+ 410              	.LFE75:
+ 411              		.size	isr_pwm_SetPending, .-isr_pwm_SetPending
+ 412              		.section	.text.isr_pwm_ClearPending,"ax",%progbits
+ 413              		.align	2
+ 414              		.global	isr_pwm_ClearPending
+ 415              		.thumb
+ 416              		.thumb_func
+ 417              		.type	isr_pwm_ClearPending, %function
+ 418              	isr_pwm_ClearPending:
+ 419              	.LFB76:
+ 405:Generated_Source\PSoC5/isr_pwm.c **** }
+ 406:Generated_Source\PSoC5/isr_pwm.c **** 
+ 407:Generated_Source\PSoC5/isr_pwm.c **** 
+ 408:Generated_Source\PSoC5/isr_pwm.c **** /*******************************************************************************
+ 409:Generated_Source\PSoC5/isr_pwm.c **** * Function Name: isr_pwm_ClearPending
+ 410:Generated_Source\PSoC5/isr_pwm.c **** ********************************************************************************
+ 411:Generated_Source\PSoC5/isr_pwm.c **** *
+ 412:Generated_Source\PSoC5/isr_pwm.c **** * Summary:
+ 413:Generated_Source\PSoC5/isr_pwm.c **** *   Clears a pending interrupt in the interrupt controller.
+ 414:Generated_Source\PSoC5/isr_pwm.c **** *
+ 415:Generated_Source\PSoC5/isr_pwm.c **** *   Note Some interrupt sources are clear-on-read and require the block 
+ 416:Generated_Source\PSoC5/isr_pwm.c **** *   interrupt/status register to be read/cleared with the appropriate block API 
+ 417:Generated_Source\PSoC5/isr_pwm.c **** *   (GPIO, UART, and so on). Otherwise the ISR will continue to remain in 
+ 418:Generated_Source\PSoC5/isr_pwm.c **** *   pending state even though the interrupt itself is cleared using this API.
+ 419:Generated_Source\PSoC5/isr_pwm.c **** *
+ 420:Generated_Source\PSoC5/isr_pwm.c **** * Parameters:
+ 421:Generated_Source\PSoC5/isr_pwm.c **** *   None
+ 422:Generated_Source\PSoC5/isr_pwm.c **** *
+ 423:Generated_Source\PSoC5/isr_pwm.c **** * Return:
+ARM GAS  C:\Users\z004c8dn\AppData\Local\Temp\ccwCGOfd.s 			page 16
+
+
+ 424:Generated_Source\PSoC5/isr_pwm.c **** *   None
+ 425:Generated_Source\PSoC5/isr_pwm.c **** *
+ 426:Generated_Source\PSoC5/isr_pwm.c **** *******************************************************************************/
+ 427:Generated_Source\PSoC5/isr_pwm.c **** void isr_pwm_ClearPending(void)
+ 428:Generated_Source\PSoC5/isr_pwm.c **** {
+ 420              		.loc 1 428 0
+ 421              		.cfi_startproc
+ 422              		@ args = 0, pretend = 0, frame = 0
+ 423              		@ frame_needed = 0, uses_anonymous_args = 0
+ 424              		@ link register save eliminated.
+ 429:Generated_Source\PSoC5/isr_pwm.c ****     *isr_pwm_INTC_CLR_PD = isr_pwm__INTC_MASK;
+ 425              		.loc 1 429 0
+ 426 0000 0122     		movs	r2, #1
+ 427 0002 014B     		ldr	r3, .L43
+ 428 0004 1A60     		str	r2, [r3]
+ 429 0006 7047     		bx	lr
+ 430              	.L44:
+ 431              		.align	2
+ 432              	.L43:
+ 433 0008 80E200E0 		.word	-536812928
+ 434              		.cfi_endproc
+ 435              	.LFE76:
+ 436              		.size	isr_pwm_ClearPending, .-isr_pwm_ClearPending
+ 437              		.text
+ 438              	.Letext0:
+ 439              		.file 2 "c:\\program files (x86)\\cypress\\psoc creator\\4.4\\psoc creator\\import\\gnu\\arm\\5.4.
+ 440              		.file 3 "c:\\program files (x86)\\cypress\\psoc creator\\4.4\\psoc creator\\import\\gnu\\arm\\5.4.
+ 441              		.file 4 "Generated_Source\\PSoC5/cytypes.h"
+ 442              		.file 5 "Generated_Source\\PSoC5/core_cm3.h"
+ 443              		.file 6 "Generated_Source\\PSoC5\\PWM1.h"
+ 444              		.section	.debug_info,"",%progbits
+ 445              	.Ldebug_info0:
+ 446 0000 29030000 		.4byte	0x329
+ 447 0004 0400     		.2byte	0x4
+ 448 0006 00000000 		.4byte	.Ldebug_abbrev0
+ 449 000a 04       		.byte	0x4
+ 450 000b 01       		.uleb128 0x1
+ 451 000c 62000000 		.4byte	.LASF39
+ 452 0010 0C       		.byte	0xc
+ 453 0011 2B030000 		.4byte	.LASF40
+ 454 0015 9F020000 		.4byte	.LASF41
+ 455 0019 00000000 		.4byte	.Ldebug_ranges0+0
+ 456 001d 00000000 		.4byte	0
+ 457 0021 00000000 		.4byte	.Ldebug_line0
+ 458 0025 02       		.uleb128 0x2
+ 459 0026 04       		.byte	0x4
+ 460 0027 05       		.byte	0x5
+ 461 0028 696E7400 		.ascii	"int\000"
+ 462 002c 03       		.uleb128 0x3
+ 463 002d 04       		.byte	0x4
+ 464 002e 07       		.byte	0x7
+ 465 002f 90010000 		.4byte	.LASF0
+ 466 0033 03       		.uleb128 0x3
+ 467 0034 08       		.byte	0x8
+ 468 0035 05       		.byte	0x5
+ 469 0036 02020000 		.4byte	.LASF1
+ 470 003a 03       		.uleb128 0x3
+ARM GAS  C:\Users\z004c8dn\AppData\Local\Temp\ccwCGOfd.s 			page 17
+
+
+ 471 003b 08       		.byte	0x8
+ 472 003c 04       		.byte	0x4
+ 473 003d 13030000 		.4byte	.LASF2
+ 474 0041 03       		.uleb128 0x3
+ 475 0042 01       		.byte	0x1
+ 476 0043 06       		.byte	0x6
+ 477 0044 1F030000 		.4byte	.LASF3
+ 478 0048 03       		.uleb128 0x3
+ 479 0049 01       		.byte	0x1
+ 480 004a 08       		.byte	0x8
+ 481 004b 54000000 		.4byte	.LASF4
+ 482 004f 03       		.uleb128 0x3
+ 483 0050 02       		.byte	0x2
+ 484 0051 05       		.byte	0x5
+ 485 0052 48020000 		.4byte	.LASF5
+ 486 0056 03       		.uleb128 0x3
+ 487 0057 02       		.byte	0x2
+ 488 0058 07       		.byte	0x7
+ 489 0059 07010000 		.4byte	.LASF6
+ 490 005d 04       		.uleb128 0x4
+ 491 005e 06000000 		.4byte	.LASF12
+ 492 0062 02       		.byte	0x2
+ 493 0063 3F       		.byte	0x3f
+ 494 0064 68000000 		.4byte	0x68
+ 495 0068 03       		.uleb128 0x3
+ 496 0069 04       		.byte	0x4
+ 497 006a 05       		.byte	0x5
+ 498 006b 96020000 		.4byte	.LASF7
+ 499 006f 03       		.uleb128 0x3
+ 500 0070 04       		.byte	0x4
+ 501 0071 07       		.byte	0x7
+ 502 0072 F5000000 		.4byte	.LASF8
+ 503 0076 03       		.uleb128 0x3
+ 504 0077 08       		.byte	0x8
+ 505 0078 07       		.byte	0x7
+ 506 0079 A5010000 		.4byte	.LASF9
+ 507 007d 03       		.uleb128 0x3
+ 508 007e 04       		.byte	0x4
+ 509 007f 07       		.byte	0x7
+ 510 0080 F9010000 		.4byte	.LASF10
+ 511 0084 03       		.uleb128 0x3
+ 512 0085 01       		.byte	0x1
+ 513 0086 08       		.byte	0x8
+ 514 0087 10020000 		.4byte	.LASF11
+ 515 008b 05       		.uleb128 0x5
+ 516 008c 04       		.byte	0x4
+ 517 008d 91000000 		.4byte	0x91
+ 518 0091 06       		.uleb128 0x6
+ 519 0092 04       		.uleb128 0x4
+ 520 0093 D9010000 		.4byte	.LASF13
+ 521 0097 03       		.byte	0x3
+ 522 0098 2C       		.byte	0x2c
+ 523 0099 5D000000 		.4byte	0x5d
+ 524 009d 07       		.uleb128 0x7
+ 525 009e 4E000000 		.4byte	.LASF14
+ 526 00a2 04       		.byte	0x4
+ 527 00a3 E801     		.2byte	0x1e8
+ARM GAS  C:\Users\z004c8dn\AppData\Local\Temp\ccwCGOfd.s 			page 18
+
+
+ 528 00a5 48000000 		.4byte	0x48
+ 529 00a9 07       		.uleb128 0x7
+ 530 00aa 89010000 		.4byte	.LASF15
+ 531 00ae 04       		.byte	0x4
+ 532 00af EA01     		.2byte	0x1ea
+ 533 00b1 6F000000 		.4byte	0x6f
+ 534 00b5 03       		.uleb128 0x3
+ 535 00b6 04       		.byte	0x4
+ 536 00b7 04       		.byte	0x4
+ 537 00b8 48000000 		.4byte	.LASF16
+ 538 00bc 03       		.uleb128 0x3
+ 539 00bd 08       		.byte	0x8
+ 540 00be 04       		.byte	0x4
+ 541 00bf 57010000 		.4byte	.LASF17
+ 542 00c3 07       		.uleb128 0x7
+ 543 00c4 F0000000 		.4byte	.LASF18
+ 544 00c8 04       		.byte	0x4
+ 545 00c9 9202     		.2byte	0x292
+ 546 00cb CF000000 		.4byte	0xcf
+ 547 00cf 08       		.uleb128 0x8
+ 548 00d0 9D000000 		.4byte	0x9d
+ 549 00d4 07       		.uleb128 0x7
+ 550 00d5 00000000 		.4byte	.LASF19
+ 551 00d9 04       		.byte	0x4
+ 552 00da 9402     		.2byte	0x294
+ 553 00dc E0000000 		.4byte	0xe0
+ 554 00e0 08       		.uleb128 0x8
+ 555 00e1 A9000000 		.4byte	0xa9
+ 556 00e5 07       		.uleb128 0x7
+ 557 00e6 BC010000 		.4byte	.LASF20
+ 558 00ea 04       		.byte	0x4
+ 559 00eb A402     		.2byte	0x2a4
+ 560 00ed 8B000000 		.4byte	0x8b
+ 561 00f1 09       		.uleb128 0x9
+ 562 00f2 36000000 		.4byte	.LASF21
+ 563 00f6 01       		.byte	0x1
+ 564 00f7 A7       		.byte	0xa7
+ 565 00f8 00000000 		.4byte	.LFB67
+ 566 00fc 48000000 		.4byte	.LFE67-.LFB67
+ 567 0100 01       		.uleb128 0x1
+ 568 0101 9C       		.byte	0x9c
+ 569 0102 10010000 		.4byte	0x110
+ 570 0106 0A       		.uleb128 0xa
+ 571 0107 3A000000 		.4byte	.LVL0
+ 572 010b 21030000 		.4byte	0x321
+ 573 010f 00       		.byte	0
+ 574 0110 09       		.uleb128 0x9
+ 575 0111 84020000 		.4byte	.LASF22
+ 576 0115 01       		.byte	0x1
+ 577 0116 E2       		.byte	0xe2
+ 578 0117 00000000 		.4byte	.LFB68
+ 579 011b 0C000000 		.4byte	.LFE68-.LFB68
+ 580 011f 01       		.uleb128 0x1
+ 581 0120 9C       		.byte	0x9c
+ 582 0121 40010000 		.4byte	0x140
+ 583 0125 0B       		.uleb128 0xb
+ 584 0126 9D010000 		.4byte	.LASF25
+ARM GAS  C:\Users\z004c8dn\AppData\Local\Temp\ccwCGOfd.s 			page 19
+
+
+ 585 012a 01       		.byte	0x1
+ 586 012b E2       		.byte	0xe2
+ 587 012c E5000000 		.4byte	0xe5
+ 588 0130 01       		.uleb128 0x1
+ 589 0131 50       		.byte	0x50
+ 590 0132 0C       		.uleb128 0xc
+ 591 0133 15020000 		.4byte	.LASF23
+ 592 0137 01       		.byte	0x1
+ 593 0138 E4       		.byte	0xe4
+ 594 0139 40010000 		.4byte	0x140
+ 595 013d 01       		.uleb128 0x1
+ 596 013e 53       		.byte	0x53
+ 597 013f 00       		.byte	0
+ 598 0140 05       		.uleb128 0x5
+ 599 0141 04       		.byte	0x4
+ 600 0142 E5000000 		.4byte	0xe5
+ 601 0146 0D       		.uleb128 0xd
+ 602 0147 24000000 		.4byte	.LASF27
+ 603 014b 01       		.byte	0x1
+ 604 014c FA       		.byte	0xfa
+ 605 014d E5000000 		.4byte	0xe5
+ 606 0151 00000000 		.4byte	.LFB69
+ 607 0155 0C000000 		.4byte	.LFE69-.LFB69
+ 608 0159 01       		.uleb128 0x1
+ 609 015a 9C       		.byte	0x9c
+ 610 015b 6D010000 		.4byte	0x16d
+ 611 015f 0C       		.uleb128 0xc
+ 612 0160 15020000 		.4byte	.LASF23
+ 613 0164 01       		.byte	0x1
+ 614 0165 FC       		.byte	0xfc
+ 615 0166 40010000 		.4byte	0x140
+ 616 016a 01       		.uleb128 0x1
+ 617 016b 53       		.byte	0x53
+ 618 016c 00       		.byte	0
+ 619 016d 0E       		.uleb128 0xe
+ 620 016e 75010000 		.4byte	.LASF24
+ 621 0172 01       		.byte	0x1
+ 622 0173 1C01     		.2byte	0x11c
+ 623 0175 00000000 		.4byte	.LFB70
+ 624 0179 10000000 		.4byte	.LFE70-.LFB70
+ 625 017d 01       		.uleb128 0x1
+ 626 017e 9C       		.byte	0x9c
+ 627 017f 94010000 		.4byte	0x194
+ 628 0183 0F       		.uleb128 0xf
+ 629 0184 6C010000 		.4byte	.LASF26
+ 630 0188 01       		.byte	0x1
+ 631 0189 1C01     		.2byte	0x11c
+ 632 018b 9D000000 		.4byte	0x9d
+ 633 018f 00000000 		.4byte	.LLST0
+ 634 0193 00       		.byte	0
+ 635 0194 10       		.uleb128 0x10
+ 636 0195 10000000 		.4byte	.LASF28
+ 637 0199 01       		.byte	0x1
+ 638 019a 3201     		.2byte	0x132
+ 639 019c 9D000000 		.4byte	0x9d
+ 640 01a0 00000000 		.4byte	.LFB71
+ 641 01a4 0C000000 		.4byte	.LFE71-.LFB71
+ARM GAS  C:\Users\z004c8dn\AppData\Local\Temp\ccwCGOfd.s 			page 20
+
+
+ 642 01a8 01       		.uleb128 0x1
+ 643 01a9 9C       		.byte	0x9c
+ 644 01aa BF010000 		.4byte	0x1bf
+ 645 01ae 11       		.uleb128 0x11
+ 646 01af 6C010000 		.4byte	.LASF26
+ 647 01b3 01       		.byte	0x1
+ 648 01b4 3401     		.2byte	0x134
+ 649 01b6 9D000000 		.4byte	0x9d
+ 650 01ba 21000000 		.4byte	.LLST1
+ 651 01be 00       		.byte	0
+ 652 01bf 12       		.uleb128 0x12
+ 653 01c0 39020000 		.4byte	.LASF29
+ 654 01c4 01       		.byte	0x1
+ 655 01c5 4D01     		.2byte	0x14d
+ 656 01c7 00000000 		.4byte	.LFB72
+ 657 01cb 0C000000 		.4byte	.LFE72-.LFB72
+ 658 01cf 01       		.uleb128 0x1
+ 659 01d0 9C       		.byte	0x9c
+ 660 01d1 13       		.uleb128 0x13
+ 661 01d2 73020000 		.4byte	.LASF42
+ 662 01d6 01       		.byte	0x1
+ 663 01d7 6201     		.2byte	0x162
+ 664 01d9 9D000000 		.4byte	0x9d
+ 665 01dd 00000000 		.4byte	.LFB73
+ 666 01e1 10000000 		.4byte	.LFE73-.LFB73
+ 667 01e5 01       		.uleb128 0x1
+ 668 01e6 9C       		.byte	0x9c
+ 669 01e7 12       		.uleb128 0x12
+ 670 01e8 52020000 		.4byte	.LASF30
+ 671 01ec 01       		.byte	0x1
+ 672 01ed 7701     		.2byte	0x177
+ 673 01ef 00000000 		.4byte	.LFB74
+ 674 01f3 0C000000 		.4byte	.LFE74-.LFB74
+ 675 01f7 01       		.uleb128 0x1
+ 676 01f8 9C       		.byte	0x9c
+ 677 01f9 09       		.uleb128 0x9
+ 678 01fa 5E010000 		.4byte	.LASF31
+ 679 01fe 01       		.byte	0x1
+ 680 01ff 44       		.byte	0x44
+ 681 0200 00000000 		.4byte	.LFB64
+ 682 0204 1C000000 		.4byte	.LFE64-.LFB64
+ 683 0208 01       		.uleb128 0x1
+ 684 0209 9C       		.byte	0x9c
+ 685 020a 4B020000 		.4byte	0x24b
+ 686 020e 0A       		.uleb128 0xa
+ 687 020f 06000000 		.4byte	.LVL8
+ 688 0213 E7010000 		.4byte	0x1e7
+ 689 0217 14       		.uleb128 0x14
+ 690 0218 0C000000 		.4byte	.LVL9
+ 691 021c 10010000 		.4byte	0x110
+ 692 0220 2E020000 		.4byte	0x22e
+ 693 0224 15       		.uleb128 0x15
+ 694 0225 01       		.uleb128 0x1
+ 695 0226 50       		.byte	0x50
+ 696 0227 05       		.uleb128 0x5
+ 697 0228 03       		.byte	0x3
+ 698 0229 00000000 		.4byte	isr_pwm_Interrupt
+ARM GAS  C:\Users\z004c8dn\AppData\Local\Temp\ccwCGOfd.s 			page 21
+
+
+ 699 022d 00       		.byte	0
+ 700 022e 14       		.uleb128 0x14
+ 701 022f 12000000 		.4byte	.LVL10
+ 702 0233 6D010000 		.4byte	0x16d
+ 703 0237 41020000 		.4byte	0x241
+ 704 023b 15       		.uleb128 0x15
+ 705 023c 01       		.uleb128 0x1
+ 706 023d 50       		.byte	0x50
+ 707 023e 01       		.uleb128 0x1
+ 708 023f 37       		.byte	0x37
+ 709 0240 00       		.byte	0
+ 710 0241 0A       		.uleb128 0xa
+ 711 0242 16000000 		.4byte	.LVL11
+ 712 0246 BF010000 		.4byte	0x1bf
+ 713 024a 00       		.byte	0
+ 714 024b 09       		.uleb128 0x9
+ 715 024c C9010000 		.4byte	.LASF32
+ 716 0250 01       		.byte	0x1
+ 717 0251 6F       		.byte	0x6f
+ 718 0252 00000000 		.4byte	.LFB65
+ 719 0256 1A000000 		.4byte	.LFE65-.LFB65
+ 720 025a 01       		.uleb128 0x1
+ 721 025b 9C       		.byte	0x9c
+ 722 025c A9020000 		.4byte	0x2a9
+ 723 0260 16       		.uleb128 0x16
+ 724 0261 9D010000 		.4byte	.LASF25
+ 725 0265 01       		.byte	0x1
+ 726 0266 6F       		.byte	0x6f
+ 727 0267 E5000000 		.4byte	0xe5
+ 728 026b 38000000 		.4byte	.LLST2
+ 729 026f 0A       		.uleb128 0xa
+ 730 0270 08000000 		.4byte	.LVL13
+ 731 0274 E7010000 		.4byte	0x1e7
+ 732 0278 14       		.uleb128 0x14
+ 733 0279 0E000000 		.4byte	.LVL14
+ 734 027d 10010000 		.4byte	0x110
+ 735 0281 8C020000 		.4byte	0x28c
+ 736 0285 15       		.uleb128 0x15
+ 737 0286 01       		.uleb128 0x1
+ 738 0287 50       		.byte	0x50
+ 739 0288 02       		.uleb128 0x2
+ 740 0289 74       		.byte	0x74
+ 741 028a 00       		.sleb128 0
+ 742 028b 00       		.byte	0
+ 743 028c 14       		.uleb128 0x14
+ 744 028d 14000000 		.4byte	.LVL15
+ 745 0291 6D010000 		.4byte	0x16d
+ 746 0295 9F020000 		.4byte	0x29f
+ 747 0299 15       		.uleb128 0x15
+ 748 029a 01       		.uleb128 0x1
+ 749 029b 50       		.byte	0x50
+ 750 029c 01       		.uleb128 0x1
+ 751 029d 37       		.byte	0x37
+ 752 029e 00       		.byte	0
+ 753 029f 0A       		.uleb128 0xa
+ 754 02a0 18000000 		.4byte	.LVL16
+ 755 02a4 BF010000 		.4byte	0x1bf
+ARM GAS  C:\Users\z004c8dn\AppData\Local\Temp\ccwCGOfd.s 			page 22
+
+
+ 756 02a8 00       		.byte	0
+ 757 02a9 09       		.uleb128 0x9
+ 758 02aa 4A010000 		.4byte	.LASF33
+ 759 02ae 01       		.byte	0x1
+ 760 02af 8D       		.byte	0x8d
+ 761 02b0 00000000 		.4byte	.LFB66
+ 762 02b4 14000000 		.4byte	.LFE66-.LFB66
+ 763 02b8 01       		.uleb128 0x1
+ 764 02b9 9C       		.byte	0x9c
+ 765 02ba D1020000 		.4byte	0x2d1
+ 766 02be 0A       		.uleb128 0xa
+ 767 02bf 06000000 		.4byte	.LVL17
+ 768 02c3 E7010000 		.4byte	0x1e7
+ 769 02c7 0A       		.uleb128 0xa
+ 770 02c8 0C000000 		.4byte	.LVL18
+ 771 02cc 10010000 		.4byte	0x110
+ 772 02d0 00       		.byte	0
+ 773 02d1 12       		.uleb128 0x12
+ 774 02d2 37010000 		.4byte	.LASF34
+ 775 02d6 01       		.byte	0x1
+ 776 02d7 9201     		.2byte	0x192
+ 777 02d9 00000000 		.4byte	.LFB75
+ 778 02dd 0C000000 		.4byte	.LFE75-.LFB75
+ 779 02e1 01       		.uleb128 0x1
+ 780 02e2 9C       		.byte	0x9c
+ 781 02e3 12       		.uleb128 0x12
+ 782 02e4 24020000 		.4byte	.LASF35
+ 783 02e8 01       		.byte	0x1
+ 784 02e9 AB01     		.2byte	0x1ab
+ 785 02eb 00000000 		.4byte	.LFB76
+ 786 02ef 0C000000 		.4byte	.LFE76-.LFB76
+ 787 02f3 01       		.uleb128 0x1
+ 788 02f4 9C       		.byte	0x9c
+ 789 02f5 17       		.uleb128 0x17
+ 790 02f6 2A010000 		.4byte	.LASF36
+ 791 02fa 05       		.byte	0x5
+ 792 02fb 1207     		.2byte	0x712
+ 793 02fd 01030000 		.4byte	0x301
+ 794 0301 08       		.uleb128 0x8
+ 795 0302 92000000 		.4byte	0x92
+ 796 0306 18       		.uleb128 0x18
+ 797 0307 1A010000 		.4byte	.LASF37
+ 798 030b 01       		.byte	0x1
+ 799 030c 24       		.byte	0x24
+ 800 030d 11030000 		.4byte	0x311
+ 801 0311 08       		.uleb128 0x8
+ 802 0312 25000000 		.4byte	0x25
+ 803 0316 18       		.uleb128 0x18
+ 804 0317 62020000 		.4byte	.LASF38
+ 805 031b 01       		.byte	0x1
+ 806 031c 25       		.byte	0x25
+ 807 031d 11030000 		.4byte	0x311
+ 808 0321 19       		.uleb128 0x19
+ 809 0322 E1010000 		.4byte	.LASF43
+ 810 0326 E1010000 		.4byte	.LASF43
+ 811 032a 06       		.byte	0x6
+ 812 032b 97       		.byte	0x97
+ARM GAS  C:\Users\z004c8dn\AppData\Local\Temp\ccwCGOfd.s 			page 23
+
+
+ 813 032c 00       		.byte	0
+ 814              		.section	.debug_abbrev,"",%progbits
+ 815              	.Ldebug_abbrev0:
+ 816 0000 01       		.uleb128 0x1
+ 817 0001 11       		.uleb128 0x11
+ 818 0002 01       		.byte	0x1
+ 819 0003 25       		.uleb128 0x25
+ 820 0004 0E       		.uleb128 0xe
+ 821 0005 13       		.uleb128 0x13
+ 822 0006 0B       		.uleb128 0xb
+ 823 0007 03       		.uleb128 0x3
+ 824 0008 0E       		.uleb128 0xe
+ 825 0009 1B       		.uleb128 0x1b
+ 826 000a 0E       		.uleb128 0xe
+ 827 000b 55       		.uleb128 0x55
+ 828 000c 17       		.uleb128 0x17
+ 829 000d 11       		.uleb128 0x11
+ 830 000e 01       		.uleb128 0x1
+ 831 000f 10       		.uleb128 0x10
+ 832 0010 17       		.uleb128 0x17
+ 833 0011 00       		.byte	0
+ 834 0012 00       		.byte	0
+ 835 0013 02       		.uleb128 0x2
+ 836 0014 24       		.uleb128 0x24
+ 837 0015 00       		.byte	0
+ 838 0016 0B       		.uleb128 0xb
+ 839 0017 0B       		.uleb128 0xb
+ 840 0018 3E       		.uleb128 0x3e
+ 841 0019 0B       		.uleb128 0xb
+ 842 001a 03       		.uleb128 0x3
+ 843 001b 08       		.uleb128 0x8
+ 844 001c 00       		.byte	0
+ 845 001d 00       		.byte	0
+ 846 001e 03       		.uleb128 0x3
+ 847 001f 24       		.uleb128 0x24
+ 848 0020 00       		.byte	0
+ 849 0021 0B       		.uleb128 0xb
+ 850 0022 0B       		.uleb128 0xb
+ 851 0023 3E       		.uleb128 0x3e
+ 852 0024 0B       		.uleb128 0xb
+ 853 0025 03       		.uleb128 0x3
+ 854 0026 0E       		.uleb128 0xe
+ 855 0027 00       		.byte	0
+ 856 0028 00       		.byte	0
+ 857 0029 04       		.uleb128 0x4
+ 858 002a 16       		.uleb128 0x16
+ 859 002b 00       		.byte	0
+ 860 002c 03       		.uleb128 0x3
+ 861 002d 0E       		.uleb128 0xe
+ 862 002e 3A       		.uleb128 0x3a
+ 863 002f 0B       		.uleb128 0xb
+ 864 0030 3B       		.uleb128 0x3b
+ 865 0031 0B       		.uleb128 0xb
+ 866 0032 49       		.uleb128 0x49
+ 867 0033 13       		.uleb128 0x13
+ 868 0034 00       		.byte	0
+ 869 0035 00       		.byte	0
+ARM GAS  C:\Users\z004c8dn\AppData\Local\Temp\ccwCGOfd.s 			page 24
+
+
+ 870 0036 05       		.uleb128 0x5
+ 871 0037 0F       		.uleb128 0xf
+ 872 0038 00       		.byte	0
+ 873 0039 0B       		.uleb128 0xb
+ 874 003a 0B       		.uleb128 0xb
+ 875 003b 49       		.uleb128 0x49
+ 876 003c 13       		.uleb128 0x13
+ 877 003d 00       		.byte	0
+ 878 003e 00       		.byte	0
+ 879 003f 06       		.uleb128 0x6
+ 880 0040 15       		.uleb128 0x15
+ 881 0041 00       		.byte	0
+ 882 0042 27       		.uleb128 0x27
+ 883 0043 19       		.uleb128 0x19
+ 884 0044 00       		.byte	0
+ 885 0045 00       		.byte	0
+ 886 0046 07       		.uleb128 0x7
+ 887 0047 16       		.uleb128 0x16
+ 888 0048 00       		.byte	0
+ 889 0049 03       		.uleb128 0x3
+ 890 004a 0E       		.uleb128 0xe
+ 891 004b 3A       		.uleb128 0x3a
+ 892 004c 0B       		.uleb128 0xb
+ 893 004d 3B       		.uleb128 0x3b
+ 894 004e 05       		.uleb128 0x5
+ 895 004f 49       		.uleb128 0x49
+ 896 0050 13       		.uleb128 0x13
+ 897 0051 00       		.byte	0
+ 898 0052 00       		.byte	0
+ 899 0053 08       		.uleb128 0x8
+ 900 0054 35       		.uleb128 0x35
+ 901 0055 00       		.byte	0
+ 902 0056 49       		.uleb128 0x49
+ 903 0057 13       		.uleb128 0x13
+ 904 0058 00       		.byte	0
+ 905 0059 00       		.byte	0
+ 906 005a 09       		.uleb128 0x9
+ 907 005b 2E       		.uleb128 0x2e
+ 908 005c 01       		.byte	0x1
+ 909 005d 3F       		.uleb128 0x3f
+ 910 005e 19       		.uleb128 0x19
+ 911 005f 03       		.uleb128 0x3
+ 912 0060 0E       		.uleb128 0xe
+ 913 0061 3A       		.uleb128 0x3a
+ 914 0062 0B       		.uleb128 0xb
+ 915 0063 3B       		.uleb128 0x3b
+ 916 0064 0B       		.uleb128 0xb
+ 917 0065 27       		.uleb128 0x27
+ 918 0066 19       		.uleb128 0x19
+ 919 0067 11       		.uleb128 0x11
+ 920 0068 01       		.uleb128 0x1
+ 921 0069 12       		.uleb128 0x12
+ 922 006a 06       		.uleb128 0x6
+ 923 006b 40       		.uleb128 0x40
+ 924 006c 18       		.uleb128 0x18
+ 925 006d 9742     		.uleb128 0x2117
+ 926 006f 19       		.uleb128 0x19
+ARM GAS  C:\Users\z004c8dn\AppData\Local\Temp\ccwCGOfd.s 			page 25
+
+
+ 927 0070 01       		.uleb128 0x1
+ 928 0071 13       		.uleb128 0x13
+ 929 0072 00       		.byte	0
+ 930 0073 00       		.byte	0
+ 931 0074 0A       		.uleb128 0xa
+ 932 0075 898201   		.uleb128 0x4109
+ 933 0078 00       		.byte	0
+ 934 0079 11       		.uleb128 0x11
+ 935 007a 01       		.uleb128 0x1
+ 936 007b 31       		.uleb128 0x31
+ 937 007c 13       		.uleb128 0x13
+ 938 007d 00       		.byte	0
+ 939 007e 00       		.byte	0
+ 940 007f 0B       		.uleb128 0xb
+ 941 0080 05       		.uleb128 0x5
+ 942 0081 00       		.byte	0
+ 943 0082 03       		.uleb128 0x3
+ 944 0083 0E       		.uleb128 0xe
+ 945 0084 3A       		.uleb128 0x3a
+ 946 0085 0B       		.uleb128 0xb
+ 947 0086 3B       		.uleb128 0x3b
+ 948 0087 0B       		.uleb128 0xb
+ 949 0088 49       		.uleb128 0x49
+ 950 0089 13       		.uleb128 0x13
+ 951 008a 02       		.uleb128 0x2
+ 952 008b 18       		.uleb128 0x18
+ 953 008c 00       		.byte	0
+ 954 008d 00       		.byte	0
+ 955 008e 0C       		.uleb128 0xc
+ 956 008f 34       		.uleb128 0x34
+ 957 0090 00       		.byte	0
+ 958 0091 03       		.uleb128 0x3
+ 959 0092 0E       		.uleb128 0xe
+ 960 0093 3A       		.uleb128 0x3a
+ 961 0094 0B       		.uleb128 0xb
+ 962 0095 3B       		.uleb128 0x3b
+ 963 0096 0B       		.uleb128 0xb
+ 964 0097 49       		.uleb128 0x49
+ 965 0098 13       		.uleb128 0x13
+ 966 0099 02       		.uleb128 0x2
+ 967 009a 18       		.uleb128 0x18
+ 968 009b 00       		.byte	0
+ 969 009c 00       		.byte	0
+ 970 009d 0D       		.uleb128 0xd
+ 971 009e 2E       		.uleb128 0x2e
+ 972 009f 01       		.byte	0x1
+ 973 00a0 3F       		.uleb128 0x3f
+ 974 00a1 19       		.uleb128 0x19
+ 975 00a2 03       		.uleb128 0x3
+ 976 00a3 0E       		.uleb128 0xe
+ 977 00a4 3A       		.uleb128 0x3a
+ 978 00a5 0B       		.uleb128 0xb
+ 979 00a6 3B       		.uleb128 0x3b
+ 980 00a7 0B       		.uleb128 0xb
+ 981 00a8 27       		.uleb128 0x27
+ 982 00a9 19       		.uleb128 0x19
+ 983 00aa 49       		.uleb128 0x49
+ARM GAS  C:\Users\z004c8dn\AppData\Local\Temp\ccwCGOfd.s 			page 26
+
+
+ 984 00ab 13       		.uleb128 0x13
+ 985 00ac 11       		.uleb128 0x11
+ 986 00ad 01       		.uleb128 0x1
+ 987 00ae 12       		.uleb128 0x12
+ 988 00af 06       		.uleb128 0x6
+ 989 00b0 40       		.uleb128 0x40
+ 990 00b1 18       		.uleb128 0x18
+ 991 00b2 9742     		.uleb128 0x2117
+ 992 00b4 19       		.uleb128 0x19
+ 993 00b5 01       		.uleb128 0x1
+ 994 00b6 13       		.uleb128 0x13
+ 995 00b7 00       		.byte	0
+ 996 00b8 00       		.byte	0
+ 997 00b9 0E       		.uleb128 0xe
+ 998 00ba 2E       		.uleb128 0x2e
+ 999 00bb 01       		.byte	0x1
+ 1000 00bc 3F       		.uleb128 0x3f
+ 1001 00bd 19       		.uleb128 0x19
+ 1002 00be 03       		.uleb128 0x3
+ 1003 00bf 0E       		.uleb128 0xe
+ 1004 00c0 3A       		.uleb128 0x3a
+ 1005 00c1 0B       		.uleb128 0xb
+ 1006 00c2 3B       		.uleb128 0x3b
+ 1007 00c3 05       		.uleb128 0x5
+ 1008 00c4 27       		.uleb128 0x27
+ 1009 00c5 19       		.uleb128 0x19
+ 1010 00c6 11       		.uleb128 0x11
+ 1011 00c7 01       		.uleb128 0x1
+ 1012 00c8 12       		.uleb128 0x12
+ 1013 00c9 06       		.uleb128 0x6
+ 1014 00ca 40       		.uleb128 0x40
+ 1015 00cb 18       		.uleb128 0x18
+ 1016 00cc 9742     		.uleb128 0x2117
+ 1017 00ce 19       		.uleb128 0x19
+ 1018 00cf 01       		.uleb128 0x1
+ 1019 00d0 13       		.uleb128 0x13
+ 1020 00d1 00       		.byte	0
+ 1021 00d2 00       		.byte	0
+ 1022 00d3 0F       		.uleb128 0xf
+ 1023 00d4 05       		.uleb128 0x5
+ 1024 00d5 00       		.byte	0
+ 1025 00d6 03       		.uleb128 0x3
+ 1026 00d7 0E       		.uleb128 0xe
+ 1027 00d8 3A       		.uleb128 0x3a
+ 1028 00d9 0B       		.uleb128 0xb
+ 1029 00da 3B       		.uleb128 0x3b
+ 1030 00db 05       		.uleb128 0x5
+ 1031 00dc 49       		.uleb128 0x49
+ 1032 00dd 13       		.uleb128 0x13
+ 1033 00de 02       		.uleb128 0x2
+ 1034 00df 17       		.uleb128 0x17
+ 1035 00e0 00       		.byte	0
+ 1036 00e1 00       		.byte	0
+ 1037 00e2 10       		.uleb128 0x10
+ 1038 00e3 2E       		.uleb128 0x2e
+ 1039 00e4 01       		.byte	0x1
+ 1040 00e5 3F       		.uleb128 0x3f
+ARM GAS  C:\Users\z004c8dn\AppData\Local\Temp\ccwCGOfd.s 			page 27
+
+
+ 1041 00e6 19       		.uleb128 0x19
+ 1042 00e7 03       		.uleb128 0x3
+ 1043 00e8 0E       		.uleb128 0xe
+ 1044 00e9 3A       		.uleb128 0x3a
+ 1045 00ea 0B       		.uleb128 0xb
+ 1046 00eb 3B       		.uleb128 0x3b
+ 1047 00ec 05       		.uleb128 0x5
+ 1048 00ed 27       		.uleb128 0x27
+ 1049 00ee 19       		.uleb128 0x19
+ 1050 00ef 49       		.uleb128 0x49
+ 1051 00f0 13       		.uleb128 0x13
+ 1052 00f1 11       		.uleb128 0x11
+ 1053 00f2 01       		.uleb128 0x1
+ 1054 00f3 12       		.uleb128 0x12
+ 1055 00f4 06       		.uleb128 0x6
+ 1056 00f5 40       		.uleb128 0x40
+ 1057 00f6 18       		.uleb128 0x18
+ 1058 00f7 9742     		.uleb128 0x2117
+ 1059 00f9 19       		.uleb128 0x19
+ 1060 00fa 01       		.uleb128 0x1
+ 1061 00fb 13       		.uleb128 0x13
+ 1062 00fc 00       		.byte	0
+ 1063 00fd 00       		.byte	0
+ 1064 00fe 11       		.uleb128 0x11
+ 1065 00ff 34       		.uleb128 0x34
+ 1066 0100 00       		.byte	0
+ 1067 0101 03       		.uleb128 0x3
+ 1068 0102 0E       		.uleb128 0xe
+ 1069 0103 3A       		.uleb128 0x3a
+ 1070 0104 0B       		.uleb128 0xb
+ 1071 0105 3B       		.uleb128 0x3b
+ 1072 0106 05       		.uleb128 0x5
+ 1073 0107 49       		.uleb128 0x49
+ 1074 0108 13       		.uleb128 0x13
+ 1075 0109 02       		.uleb128 0x2
+ 1076 010a 17       		.uleb128 0x17
+ 1077 010b 00       		.byte	0
+ 1078 010c 00       		.byte	0
+ 1079 010d 12       		.uleb128 0x12
+ 1080 010e 2E       		.uleb128 0x2e
+ 1081 010f 00       		.byte	0
+ 1082 0110 3F       		.uleb128 0x3f
+ 1083 0111 19       		.uleb128 0x19
+ 1084 0112 03       		.uleb128 0x3
+ 1085 0113 0E       		.uleb128 0xe
+ 1086 0114 3A       		.uleb128 0x3a
+ 1087 0115 0B       		.uleb128 0xb
+ 1088 0116 3B       		.uleb128 0x3b
+ 1089 0117 05       		.uleb128 0x5
+ 1090 0118 27       		.uleb128 0x27
+ 1091 0119 19       		.uleb128 0x19
+ 1092 011a 11       		.uleb128 0x11
+ 1093 011b 01       		.uleb128 0x1
+ 1094 011c 12       		.uleb128 0x12
+ 1095 011d 06       		.uleb128 0x6
+ 1096 011e 40       		.uleb128 0x40
+ 1097 011f 18       		.uleb128 0x18
+ARM GAS  C:\Users\z004c8dn\AppData\Local\Temp\ccwCGOfd.s 			page 28
+
+
+ 1098 0120 9742     		.uleb128 0x2117
+ 1099 0122 19       		.uleb128 0x19
+ 1100 0123 00       		.byte	0
+ 1101 0124 00       		.byte	0
+ 1102 0125 13       		.uleb128 0x13
+ 1103 0126 2E       		.uleb128 0x2e
+ 1104 0127 00       		.byte	0
+ 1105 0128 3F       		.uleb128 0x3f
+ 1106 0129 19       		.uleb128 0x19
+ 1107 012a 03       		.uleb128 0x3
+ 1108 012b 0E       		.uleb128 0xe
+ 1109 012c 3A       		.uleb128 0x3a
+ 1110 012d 0B       		.uleb128 0xb
+ 1111 012e 3B       		.uleb128 0x3b
+ 1112 012f 05       		.uleb128 0x5
+ 1113 0130 27       		.uleb128 0x27
+ 1114 0131 19       		.uleb128 0x19
+ 1115 0132 49       		.uleb128 0x49
+ 1116 0133 13       		.uleb128 0x13
+ 1117 0134 11       		.uleb128 0x11
+ 1118 0135 01       		.uleb128 0x1
+ 1119 0136 12       		.uleb128 0x12
+ 1120 0137 06       		.uleb128 0x6
+ 1121 0138 40       		.uleb128 0x40
+ 1122 0139 18       		.uleb128 0x18
+ 1123 013a 9742     		.uleb128 0x2117
+ 1124 013c 19       		.uleb128 0x19
+ 1125 013d 00       		.byte	0
+ 1126 013e 00       		.byte	0
+ 1127 013f 14       		.uleb128 0x14
+ 1128 0140 898201   		.uleb128 0x4109
+ 1129 0143 01       		.byte	0x1
+ 1130 0144 11       		.uleb128 0x11
+ 1131 0145 01       		.uleb128 0x1
+ 1132 0146 31       		.uleb128 0x31
+ 1133 0147 13       		.uleb128 0x13
+ 1134 0148 01       		.uleb128 0x1
+ 1135 0149 13       		.uleb128 0x13
+ 1136 014a 00       		.byte	0
+ 1137 014b 00       		.byte	0
+ 1138 014c 15       		.uleb128 0x15
+ 1139 014d 8A8201   		.uleb128 0x410a
+ 1140 0150 00       		.byte	0
+ 1141 0151 02       		.uleb128 0x2
+ 1142 0152 18       		.uleb128 0x18
+ 1143 0153 9142     		.uleb128 0x2111
+ 1144 0155 18       		.uleb128 0x18
+ 1145 0156 00       		.byte	0
+ 1146 0157 00       		.byte	0
+ 1147 0158 16       		.uleb128 0x16
+ 1148 0159 05       		.uleb128 0x5
+ 1149 015a 00       		.byte	0
+ 1150 015b 03       		.uleb128 0x3
+ 1151 015c 0E       		.uleb128 0xe
+ 1152 015d 3A       		.uleb128 0x3a
+ 1153 015e 0B       		.uleb128 0xb
+ 1154 015f 3B       		.uleb128 0x3b
+ARM GAS  C:\Users\z004c8dn\AppData\Local\Temp\ccwCGOfd.s 			page 29
+
+
+ 1155 0160 0B       		.uleb128 0xb
+ 1156 0161 49       		.uleb128 0x49
+ 1157 0162 13       		.uleb128 0x13
+ 1158 0163 02       		.uleb128 0x2
+ 1159 0164 17       		.uleb128 0x17
+ 1160 0165 00       		.byte	0
+ 1161 0166 00       		.byte	0
+ 1162 0167 17       		.uleb128 0x17
+ 1163 0168 34       		.uleb128 0x34
+ 1164 0169 00       		.byte	0
+ 1165 016a 03       		.uleb128 0x3
+ 1166 016b 0E       		.uleb128 0xe
+ 1167 016c 3A       		.uleb128 0x3a
+ 1168 016d 0B       		.uleb128 0xb
+ 1169 016e 3B       		.uleb128 0x3b
+ 1170 016f 05       		.uleb128 0x5
+ 1171 0170 49       		.uleb128 0x49
+ 1172 0171 13       		.uleb128 0x13
+ 1173 0172 3F       		.uleb128 0x3f
+ 1174 0173 19       		.uleb128 0x19
+ 1175 0174 3C       		.uleb128 0x3c
+ 1176 0175 19       		.uleb128 0x19
+ 1177 0176 00       		.byte	0
+ 1178 0177 00       		.byte	0
+ 1179 0178 18       		.uleb128 0x18
+ 1180 0179 34       		.uleb128 0x34
+ 1181 017a 00       		.byte	0
+ 1182 017b 03       		.uleb128 0x3
+ 1183 017c 0E       		.uleb128 0xe
+ 1184 017d 3A       		.uleb128 0x3a
+ 1185 017e 0B       		.uleb128 0xb
+ 1186 017f 3B       		.uleb128 0x3b
+ 1187 0180 0B       		.uleb128 0xb
+ 1188 0181 49       		.uleb128 0x49
+ 1189 0182 13       		.uleb128 0x13
+ 1190 0183 3F       		.uleb128 0x3f
+ 1191 0184 19       		.uleb128 0x19
+ 1192 0185 3C       		.uleb128 0x3c
+ 1193 0186 19       		.uleb128 0x19
+ 1194 0187 00       		.byte	0
+ 1195 0188 00       		.byte	0
+ 1196 0189 19       		.uleb128 0x19
+ 1197 018a 2E       		.uleb128 0x2e
+ 1198 018b 00       		.byte	0
+ 1199 018c 3F       		.uleb128 0x3f
+ 1200 018d 19       		.uleb128 0x19
+ 1201 018e 3C       		.uleb128 0x3c
+ 1202 018f 19       		.uleb128 0x19
+ 1203 0190 6E       		.uleb128 0x6e
+ 1204 0191 0E       		.uleb128 0xe
+ 1205 0192 03       		.uleb128 0x3
+ 1206 0193 0E       		.uleb128 0xe
+ 1207 0194 3A       		.uleb128 0x3a
+ 1208 0195 0B       		.uleb128 0xb
+ 1209 0196 3B       		.uleb128 0x3b
+ 1210 0197 0B       		.uleb128 0xb
+ 1211 0198 00       		.byte	0
+ARM GAS  C:\Users\z004c8dn\AppData\Local\Temp\ccwCGOfd.s 			page 30
+
+
+ 1212 0199 00       		.byte	0
+ 1213 019a 00       		.byte	0
+ 1214              		.section	.debug_loc,"",%progbits
+ 1215              	.Ldebug_loc0:
+ 1216              	.LLST0:
+ 1217 0000 00000000 		.4byte	.LVL4
+ 1218 0004 02000000 		.4byte	.LVL5
+ 1219 0008 0100     		.2byte	0x1
+ 1220 000a 50       		.byte	0x50
+ 1221 000b 02000000 		.4byte	.LVL5
+ 1222 000f 10000000 		.4byte	.LFE70
+ 1223 0013 0400     		.2byte	0x4
+ 1224 0015 F3       		.byte	0xf3
+ 1225 0016 01       		.uleb128 0x1
+ 1226 0017 50       		.byte	0x50
+ 1227 0018 9F       		.byte	0x9f
+ 1228 0019 00000000 		.4byte	0
+ 1229 001d 00000000 		.4byte	0
+ 1230              	.LLST1:
+ 1231 0021 04000000 		.4byte	.LVL6
+ 1232 0025 06000000 		.4byte	.LVL7
+ 1233 0029 0500     		.2byte	0x5
+ 1234 002b 70       		.byte	0x70
+ 1235 002c 00       		.sleb128 0
+ 1236 002d 35       		.byte	0x35
+ 1237 002e 25       		.byte	0x25
+ 1238 002f 9F       		.byte	0x9f
+ 1239 0030 00000000 		.4byte	0
+ 1240 0034 00000000 		.4byte	0
+ 1241              	.LLST2:
+ 1242 0038 00000000 		.4byte	.LVL12
+ 1243 003c 07000000 		.4byte	.LVL13-1
+ 1244 0040 0100     		.2byte	0x1
+ 1245 0042 50       		.byte	0x50
+ 1246 0043 07000000 		.4byte	.LVL13-1
+ 1247 0047 1A000000 		.4byte	.LFE65
+ 1248 004b 0100     		.2byte	0x1
+ 1249 004d 54       		.byte	0x54
+ 1250 004e 00000000 		.4byte	0
+ 1251 0052 00000000 		.4byte	0
+ 1252              		.section	.debug_aranges,"",%progbits
+ 1253 0000 7C000000 		.4byte	0x7c
+ 1254 0004 0200     		.2byte	0x2
+ 1255 0006 00000000 		.4byte	.Ldebug_info0
+ 1256 000a 04       		.byte	0x4
+ 1257 000b 00       		.byte	0
+ 1258 000c 0000     		.2byte	0
+ 1259 000e 0000     		.2byte	0
+ 1260 0010 00000000 		.4byte	.LFB67
+ 1261 0014 48000000 		.4byte	.LFE67-.LFB67
+ 1262 0018 00000000 		.4byte	.LFB68
+ 1263 001c 0C000000 		.4byte	.LFE68-.LFB68
+ 1264 0020 00000000 		.4byte	.LFB69
+ 1265 0024 0C000000 		.4byte	.LFE69-.LFB69
+ 1266 0028 00000000 		.4byte	.LFB70
+ 1267 002c 10000000 		.4byte	.LFE70-.LFB70
+ 1268 0030 00000000 		.4byte	.LFB71
+ARM GAS  C:\Users\z004c8dn\AppData\Local\Temp\ccwCGOfd.s 			page 31
+
+
+ 1269 0034 0C000000 		.4byte	.LFE71-.LFB71
+ 1270 0038 00000000 		.4byte	.LFB72
+ 1271 003c 0C000000 		.4byte	.LFE72-.LFB72
+ 1272 0040 00000000 		.4byte	.LFB73
+ 1273 0044 10000000 		.4byte	.LFE73-.LFB73
+ 1274 0048 00000000 		.4byte	.LFB74
+ 1275 004c 0C000000 		.4byte	.LFE74-.LFB74
+ 1276 0050 00000000 		.4byte	.LFB64
+ 1277 0054 1C000000 		.4byte	.LFE64-.LFB64
+ 1278 0058 00000000 		.4byte	.LFB65
+ 1279 005c 1A000000 		.4byte	.LFE65-.LFB65
+ 1280 0060 00000000 		.4byte	.LFB66
+ 1281 0064 14000000 		.4byte	.LFE66-.LFB66
+ 1282 0068 00000000 		.4byte	.LFB75
+ 1283 006c 0C000000 		.4byte	.LFE75-.LFB75
+ 1284 0070 00000000 		.4byte	.LFB76
+ 1285 0074 0C000000 		.4byte	.LFE76-.LFB76
+ 1286 0078 00000000 		.4byte	0
+ 1287 007c 00000000 		.4byte	0
+ 1288              		.section	.debug_ranges,"",%progbits
+ 1289              	.Ldebug_ranges0:
+ 1290 0000 00000000 		.4byte	.LFB67
+ 1291 0004 48000000 		.4byte	.LFE67
+ 1292 0008 00000000 		.4byte	.LFB68
+ 1293 000c 0C000000 		.4byte	.LFE68
+ 1294 0010 00000000 		.4byte	.LFB69
+ 1295 0014 0C000000 		.4byte	.LFE69
+ 1296 0018 00000000 		.4byte	.LFB70
+ 1297 001c 10000000 		.4byte	.LFE70
+ 1298 0020 00000000 		.4byte	.LFB71
+ 1299 0024 0C000000 		.4byte	.LFE71
+ 1300 0028 00000000 		.4byte	.LFB72
+ 1301 002c 0C000000 		.4byte	.LFE72
+ 1302 0030 00000000 		.4byte	.LFB73
+ 1303 0034 10000000 		.4byte	.LFE73
+ 1304 0038 00000000 		.4byte	.LFB74
+ 1305 003c 0C000000 		.4byte	.LFE74
+ 1306 0040 00000000 		.4byte	.LFB64
+ 1307 0044 1C000000 		.4byte	.LFE64
+ 1308 0048 00000000 		.4byte	.LFB65
+ 1309 004c 1A000000 		.4byte	.LFE65
+ 1310 0050 00000000 		.4byte	.LFB66
+ 1311 0054 14000000 		.4byte	.LFE66
+ 1312 0058 00000000 		.4byte	.LFB75
+ 1313 005c 0C000000 		.4byte	.LFE75
+ 1314 0060 00000000 		.4byte	.LFB76
+ 1315 0064 0C000000 		.4byte	.LFE76
+ 1316 0068 00000000 		.4byte	0
+ 1317 006c 00000000 		.4byte	0
+ 1318              		.section	.debug_line,"",%progbits
+ 1319              	.Ldebug_line0:
+ 1320 0000 4E020000 		.section	.debug_str,"MS",%progbits,1
+ 1320      02005901 
+ 1320      00000201 
+ 1320      FB0E0D00 
+ 1320      01010101 
+ 1321              	.LASF19:
+ARM GAS  C:\Users\z004c8dn\AppData\Local\Temp\ccwCGOfd.s 			page 32
+
+
+ 1322 0000 72656733 		.ascii	"reg32\000"
+ 1322      3200
+ 1323              	.LASF12:
+ 1324 0006 5F5F696E 		.ascii	"__int32_t\000"
+ 1324      7433325F 
+ 1324      7400
+ 1325              	.LASF28:
+ 1326 0010 6973725F 		.ascii	"isr_pwm_GetPriority\000"
+ 1326      70776D5F 
+ 1326      47657450 
+ 1326      72696F72 
+ 1326      69747900 
+ 1327              	.LASF27:
+ 1328 0024 6973725F 		.ascii	"isr_pwm_GetVector\000"
+ 1328      70776D5F 
+ 1328      47657456 
+ 1328      6563746F 
+ 1328      7200
+ 1329              	.LASF21:
+ 1330 0036 6973725F 		.ascii	"isr_pwm_Interrupt\000"
+ 1330      70776D5F 
+ 1330      496E7465 
+ 1330      72727570 
+ 1330      7400
+ 1331              	.LASF16:
+ 1332 0048 666C6F61 		.ascii	"float\000"
+ 1332      7400
+ 1333              	.LASF14:
+ 1334 004e 75696E74 		.ascii	"uint8\000"
+ 1334      3800
+ 1335              	.LASF4:
+ 1336 0054 756E7369 		.ascii	"unsigned char\000"
+ 1336      676E6564 
+ 1336      20636861 
+ 1336      7200
+ 1337              	.LASF39:
+ 1338 0062 474E5520 		.ascii	"GNU C11 5.4.1 20160609 (release) [ARM/embedded-5-br"
+ 1338      43313120 
+ 1338      352E342E 
+ 1338      31203230 
+ 1338      31363036 
+ 1339 0095 616E6368 		.ascii	"anch revision 237715] -mcpu=cortex-m3 -mthumb -g -O"
+ 1339      20726576 
+ 1339      6973696F 
+ 1339      6E203233 
+ 1339      37373135 
+ 1340 00c8 67202D66 		.ascii	"g -ffunction-sections -ffat-lto-objects\000"
+ 1340      66756E63 
+ 1340      74696F6E 
+ 1340      2D736563 
+ 1340      74696F6E 
+ 1341              	.LASF18:
+ 1342 00f0 72656738 		.ascii	"reg8\000"
+ 1342      00
+ 1343              	.LASF8:
+ 1344 00f5 6C6F6E67 		.ascii	"long unsigned int\000"
+ 1344      20756E73 
+ARM GAS  C:\Users\z004c8dn\AppData\Local\Temp\ccwCGOfd.s 			page 33
+
+
+ 1344      69676E65 
+ 1344      6420696E 
+ 1344      7400
+ 1345              	.LASF6:
+ 1346 0107 73686F72 		.ascii	"short unsigned int\000"
+ 1346      7420756E 
+ 1346      7369676E 
+ 1346      65642069 
+ 1346      6E7400
+ 1347              	.LASF37:
+ 1348 011a 67546172 		.ascii	"gTargetPosition\000"
+ 1348      67657450 
+ 1348      6F736974 
+ 1348      696F6E00 
+ 1349              	.LASF36:
+ 1350 012a 49544D5F 		.ascii	"ITM_RxBuffer\000"
+ 1350      52784275 
+ 1350      66666572 
+ 1350      00
+ 1351              	.LASF34:
+ 1352 0137 6973725F 		.ascii	"isr_pwm_SetPending\000"
+ 1352      70776D5F 
+ 1352      53657450 
+ 1352      656E6469 
+ 1352      6E6700
+ 1353              	.LASF33:
+ 1354 014a 6973725F 		.ascii	"isr_pwm_Stop\000"
+ 1354      70776D5F 
+ 1354      53746F70 
+ 1354      00
+ 1355              	.LASF17:
+ 1356 0157 646F7562 		.ascii	"double\000"
+ 1356      6C6500
+ 1357              	.LASF31:
+ 1358 015e 6973725F 		.ascii	"isr_pwm_Start\000"
+ 1358      70776D5F 
+ 1358      53746172 
+ 1358      7400
+ 1359              	.LASF26:
+ 1360 016c 7072696F 		.ascii	"priority\000"
+ 1360      72697479 
+ 1360      00
+ 1361              	.LASF24:
+ 1362 0175 6973725F 		.ascii	"isr_pwm_SetPriority\000"
+ 1362      70776D5F 
+ 1362      53657450 
+ 1362      72696F72 
+ 1362      69747900 
+ 1363              	.LASF15:
+ 1364 0189 75696E74 		.ascii	"uint32\000"
+ 1364      333200
+ 1365              	.LASF0:
+ 1366 0190 756E7369 		.ascii	"unsigned int\000"
+ 1366      676E6564 
+ 1366      20696E74 
+ 1366      00
+ 1367              	.LASF25:
+ARM GAS  C:\Users\z004c8dn\AppData\Local\Temp\ccwCGOfd.s 			page 34
+
+
+ 1368 019d 61646472 		.ascii	"address\000"
+ 1368      65737300 
+ 1369              	.LASF9:
+ 1370 01a5 6C6F6E67 		.ascii	"long long unsigned int\000"
+ 1370      206C6F6E 
+ 1370      6720756E 
+ 1370      7369676E 
+ 1370      65642069 
+ 1371              	.LASF20:
+ 1372 01bc 63796973 		.ascii	"cyisraddress\000"
+ 1372      72616464 
+ 1372      72657373 
+ 1372      00
+ 1373              	.LASF32:
+ 1374 01c9 6973725F 		.ascii	"isr_pwm_StartEx\000"
+ 1374      70776D5F 
+ 1374      53746172 
+ 1374      74457800 
+ 1375              	.LASF13:
+ 1376 01d9 696E7433 		.ascii	"int32_t\000"
+ 1376      325F7400 
+ 1377              	.LASF43:
+ 1378 01e1 50574D31 		.ascii	"PWM1_ReadStatusRegister\000"
+ 1378      5F526561 
+ 1378      64537461 
+ 1378      74757352 
+ 1378      65676973 
+ 1379              	.LASF10:
+ 1380 01f9 73697A65 		.ascii	"sizetype\000"
+ 1380      74797065 
+ 1380      00
+ 1381              	.LASF1:
+ 1382 0202 6C6F6E67 		.ascii	"long long int\000"
+ 1382      206C6F6E 
+ 1382      6720696E 
+ 1382      7400
+ 1383              	.LASF11:
+ 1384 0210 63686172 		.ascii	"char\000"
+ 1384      00
+ 1385              	.LASF23:
+ 1386 0215 72616D56 		.ascii	"ramVectorTable\000"
+ 1386      6563746F 
+ 1386      72546162 
+ 1386      6C6500
+ 1387              	.LASF35:
+ 1388 0224 6973725F 		.ascii	"isr_pwm_ClearPending\000"
+ 1388      70776D5F 
+ 1388      436C6561 
+ 1388      7250656E 
+ 1388      64696E67 
+ 1389              	.LASF29:
+ 1390 0239 6973725F 		.ascii	"isr_pwm_Enable\000"
+ 1390      70776D5F 
+ 1390      456E6162 
+ 1390      6C6500
+ 1391              	.LASF5:
+ 1392 0248 73686F72 		.ascii	"short int\000"
+ARM GAS  C:\Users\z004c8dn\AppData\Local\Temp\ccwCGOfd.s 			page 35
+
+
+ 1392      7420696E 
+ 1392      7400
+ 1393              	.LASF30:
+ 1394 0252 6973725F 		.ascii	"isr_pwm_Disable\000"
+ 1394      70776D5F 
+ 1394      44697361 
+ 1394      626C6500 
+ 1395              	.LASF38:
+ 1396 0262 67437572 		.ascii	"gCurrentPosition\000"
+ 1396      72656E74 
+ 1396      506F7369 
+ 1396      74696F6E 
+ 1396      00
+ 1397              	.LASF42:
+ 1398 0273 6973725F 		.ascii	"isr_pwm_GetState\000"
+ 1398      70776D5F 
+ 1398      47657453 
+ 1398      74617465 
+ 1398      00
+ 1399              	.LASF22:
+ 1400 0284 6973725F 		.ascii	"isr_pwm_SetVector\000"
+ 1400      70776D5F 
+ 1400      53657456 
+ 1400      6563746F 
+ 1400      7200
+ 1401              	.LASF7:
+ 1402 0296 6C6F6E67 		.ascii	"long int\000"
+ 1402      20696E74 
+ 1402      00
+ 1403              	.LASF41:
+ 1404 029f 433A5C55 		.ascii	"C:\\UserData\\z004c8dn\\OneDrive - Siemens AG\\Doku"
+ 1404      73657244 
+ 1404      6174615C 
+ 1404      7A303034 
+ 1404      6338646E 
+ 1405 02ce 6D656E74 		.ascii	"mente\\PSoC Creator\\AndreasBothPSoC5Servo\\Andreas"
+ 1405      655C5053 
+ 1405      6F432043 
+ 1405      72656174 
+ 1405      6F725C41 
+ 1406 02fe 426F7468 		.ascii	"BothPSoC5Servo.cydsn\000"
+ 1406      50536F43 
+ 1406      35536572 
+ 1406      766F2E63 
+ 1406      7964736E 
+ 1407              	.LASF2:
+ 1408 0313 6C6F6E67 		.ascii	"long double\000"
+ 1408      20646F75 
+ 1408      626C6500 
+ 1409              	.LASF3:
+ 1410 031f 7369676E 		.ascii	"signed char\000"
+ 1410      65642063 
+ 1410      68617200 
+ 1411              	.LASF40:
+ 1412 032b 47656E65 		.ascii	"Generated_Source\\PSoC5\\isr_pwm.c\000"
+ 1412      72617465 
+ 1412      645F536F 
+ARM GAS  C:\Users\z004c8dn\AppData\Local\Temp\ccwCGOfd.s 			page 36
+
+
+ 1412      75726365 
+ 1412      5C50536F 
+ 1413              		.ident	"GCC: (GNU Tools for ARM Embedded Processors) 5.4.1 20160609 (release) [ARM/embedded-5-bran
