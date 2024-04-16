@@ -1,5 +1,6 @@
 
-<big> This README file contais all the edited files of the project (the main.c file, the isr_rx.c file and the isr_pwm.c file) The other project files are available in their corresponding directories </big>
+This README file contais all the edited files of the project (the main.c file, the isr_rx.c file and the isr_pwm.c file) The other project files are available in their corresponding directories 
+I added the account kimmosa as a collaborator of this project so you should be able to edit it.
 ```
 /* ========================================
  *
